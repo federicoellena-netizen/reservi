@@ -84,6 +84,33 @@ body {
   color: var(--text-muted);
 }
 
+/* Select & input type fixes */
+select.input,
+input[type="time"].input {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  -webkit-appearance: none;
+  appearance: none;
+}
+select.input option {
+  background: var(--modal-bg);
+  color: var(--text-primary);
+}
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+}
+[data-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+}
+
+/* Number input arrows */
+input[type="number"].input {
+  -moz-appearance: textfield;
+}
+input[type="number"].input::-webkit-inner-spin-button {
+  opacity: 1;
+}
+
 /* Text colors */
 .text-main { color: var(--text-primary); }
 .text-sub { color: var(--text-secondary); }
