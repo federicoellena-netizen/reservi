@@ -1,27 +1,27 @@
 "use client";
 
 // Icone professionali per i turni — sostituzione emoji
-export function ShiftIcon({ type, size = 20, className = "" }: { type: string; size?: number; className?: string }) {
+export function ShiftIcon({ type, size = 20, className = "", style }: { type: string; size?: number; className?: string; style?: React.CSSProperties }) {
   // Determina l'icona in base al nome/tipo del turno
   const iconType = getIconType(type);
 
   switch (iconType) {
     case "pranzo":
       return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} style={style}>
           <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" />
           <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       );
     case "cena":
       return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} style={style}>
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       );
     default:
       return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} style={style}>
           <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
           <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
