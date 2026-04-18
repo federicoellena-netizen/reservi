@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Save, Check, Plus, Trash2, GripVertical } from "lucide-react";
 import { getTurni, saveTurni, getAttivita, aggiornaAttivita, type TurnoDB, type AttivitaDB } from "@/lib/data";
+import { ShiftIcon, SHIFT_STYLES } from "@/components/ShiftIcon";
 
 const giorniNomi = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
 
@@ -15,7 +16,7 @@ const orariDefault = giorniNomi.map((g, i) => ({
   cena_fine: "23:00",
 }));
 
-const iconeDisponibili = ["☀️🍽️", "🌙🍽️", "🌤", "☀️", "🌅", "🌙", "✨", "🍽️", "🕐", "🌞"];
+const iconeDisponibili = ["pranzo", "cena", "default"];
 
 interface TurnoConfig {
   id: string;
@@ -210,7 +211,9 @@ export default function ImpostazioniPage() {
               <div className="flex items-start gap-3">
                 {/* Icona e grip */}
                 <div className="flex flex-col items-center gap-1 pt-1">
-                  <span className="text-xl cursor-default">{turno.icona}</span>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: SHIFT_STYLES[turni.indexOf(turno) % SHIFT_STYLES.length].accentLight }}>
+                    <ShiftIcon type={turno.nome} size={18} style={{ color: SHIFT_STYLES[turni.indexOf(turno) % SHIFT_STYLES.length].accent }} />
+                  </div>
                   <GripVertical size={14} className="text-dim" />
                 </div>
 
@@ -258,25 +261,8 @@ export default function ImpostazioniPage() {
                     </div>
                   </div>
 
-                  {/* Selettore icona */}
-                  <div>
-                    <label className="text-[10px] text-dim block mb-1">Icona</label>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {iconeDisponibili.map((ic) => (
-                        <button
-                          key={ic}
-                          onClick={() => aggiornaTurno(turno.id, "icona", ic)}
-                          className={`w-8 h-8 rounded-lg text-sm flex items-center justify-center transition-all ${
-                            turno.icona === ic
-                              ? "bg-[#22c55e]/20 border border-[#22c55e]/30 scale-110"
-                              : "card hover:opacity-80"
-                          }`}
-                        >
-                          {ic}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  {/* Info: l'icona si assegna automaticamente in base al nome */}
+                  <p className="text-[10px] text-dim">L'icona si assegna automaticamente: usa "Pranzo" o "Cena" nel nome.</p>
                 </div>
 
                 {/* Pulsante elimina */}
@@ -295,11 +281,11 @@ export default function ImpostazioniPage() {
         {/* Riepilogo turni */}
         <div className="mt-4 p-3 rounded-xl bg-[#22c55e]/5 border border-[#22c55e]/10">
           <div className="text-xs text-[#22c55e] font-medium mb-2">Riepilogo giornata</div>
-          <div className="flex flex-wrap gap-2">
-            {turni.map((t) => (
+          <div className="flex flex-wrap gap-3">
+            {turni.map((t, i) => (
               <div key={t.id} className="flex items-center gap-1.5 text-xs text-sub">
-                <span>{t.icona}</span>
-                <span>{t.inizio}-{t.fine}</span>
+                <ShiftIcon type={t.nome} size={13} style={{ color: SHIFT_STYLES[i % SHIFT_STYLES.length].accent }} />
+                <span>{t.inizio}–{t.fine}</span>
                 <span className="text-dim">({t.coperti}p)</span>
               </div>
             ))}

@@ -127,6 +127,36 @@ export default function ReportPage() {
               ))}
             </div>
           </div>
+          {/* Insight */}
+          <div className="card rounded-2xl p-4 border-emerald-500/10">
+            <h3 className="font-semibold text-emerald-500 mb-3 text-sm">Insight del mese</h3>
+            <ul className="text-sm text-gray-400 space-y-2.5">
+              {stats.perFonte[0] && stats.perFonte[0].pct > 0 && (
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 mt-0.5">·</span>
+                  Il <strong className="text-main">{stats.perFonte[0].pct}% delle prenotazioni</strong> arriva da {stats.perFonte[0].fonte}
+                </li>
+              )}
+              {stats.giorniPopolari[0] && stats.giorniPopolari[0].count > 0 && (
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 mt-0.5">·</span>
+                  Il giorno più richiesto è il <strong className="text-main">{stats.giorniPopolari[0].giorno}</strong> con {stats.giorniPopolari[0].count} prenotazioni
+                </li>
+              )}
+              {stats.noShow > 0 && (
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 mt-0.5">·</span>
+                  No-show: <strong className="text-main">{stats.noShow}</strong> — {stats.noShow <= 3 ? "sotto la media di settore (12%)" : "attenzione, valuta reminder automatici"}
+                </li>
+              )}
+              {stats.totPrenotazioni > 0 && (
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 mt-0.5">·</span>
+                  Media <strong className="text-main">{(stats.totPersone / stats.totPrenotazioni).toFixed(1)} persone</strong> per prenotazione
+                </li>
+              )}
+            </ul>
+          </div>
         </>
       )}
     </div>

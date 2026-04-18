@@ -90,7 +90,7 @@ body {
 .text-dim { color: var(--text-muted); }
 
 /* Gradients */
-.gradient-green { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.gradient-green { background: linear-gradient(135deg, #059669, #10b981); }
 .gradient-blue { background: linear-gradient(135deg, #2563eb, #3b82f6); }
 .gradient-purple { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
 .gradient-orange { background: linear-gradient(135deg, #ea580c, #f97316); }
