@@ -11,8 +11,8 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Protect /dashboard routes — redirect to /login if not authenticated
-  if (pathname.startsWith("/dashboard") && !user) {
+  // Protect /dashboard and /onboarding routes — redirect to /login if not authenticated
+  if ((pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("redirect", pathname);
@@ -26,9 +26,36 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Check onboarding status for authenticated users
+  if ((pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding")) && user) {
+    try {
+      const { data: att } = await supabase
+        .from("attivita")
+        .select("onboarding_completato")
+        .eq("user_id", user.id)
+        .single();
+
+      // Redirect to onboarding if not completed
+      if (pathname.startsWith("/dashboard") && att && att.onboarding_completato === false) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/onboarding";
+        return NextResponse.redirect(url);
+      }
+
+      // Redirect to dashboard if onboarding already done
+      if (pathname.startsWith("/onboarding") && att?.onboarding_completato === true) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard";
+        return NextResponse.redirect(url);
+      }
+    } catch {
+      // If query fails (column doesn't exist yet), skip onboarding check
+    }
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/login", "/onboarding/:path*"],
 };

@@ -172,6 +172,25 @@ export async function aggiornaAttivita(attivitaId: string, updates: Partial<Atti
   if (error) throw error;
 }
 
+// ============ ONBOARDING ============
+
+export async function completeOnboarding(attivitaId: string) {
+  const { error } = await supabase
+    .from("attivita")
+    .update({ onboarding_completato: true })
+    .eq("id", attivitaId);
+  if (error) throw error;
+}
+
+export async function isOnboardingComplete(attivitaId: string): Promise<boolean> {
+  const { data } = await supabase
+    .from("attivita")
+    .select("onboarding_completato")
+    .eq("id", attivitaId)
+    .single();
+  return data?.onboarding_completato === true;
+}
+
 // ============ REPORT ============
 
 export async function getStatsMese(attivitaId: string, anno: number, mese: number) {

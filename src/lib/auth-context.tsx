@@ -66,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 user_id: user.id,
                 nome,
                 tipo: "ristorante",
+                onboarding_completato: false,
               })
               .select("id, nome, tipo")
               .single();
