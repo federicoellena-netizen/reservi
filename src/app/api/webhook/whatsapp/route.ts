@@ -11,7 +11,8 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
-const ATTIVITA_ID = "00000000-0000-0000-0000-000000000001";
+// Numero sandbox Twilio per fallback in sviluppo
+const TWILIO_SANDBOX_NUMBER = "+14155238886";
 
 function twimlResponse(message: string) {
   const xml = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${escapeXml(message)}</Message></Response>`;
@@ -24,12 +25,38 @@ function escapeXml(text: string) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// Carica o crea conversazione per questo numero
-async function getConversazione(telefono: string) {
+// Trova l'attivita dal numero WhatsApp di destinazione (To)
+async function findAttivitaByWhatsApp(toNumber: string) {
+  // Prova lookup diretto per numero WhatsApp
+  const { data } = await supabase
+    .from("attivita")
+    .select("*")
+    .eq("whatsapp", toNumber)
+    .single();
+
+  if (data) return data;
+
+  // Fallback sandbox: se il numero è quello sandbox Twilio, usa la prima attivita configurata
+  if (toNumber === TWILIO_SANDBOX_NUMBER || toNumber === "") {
+    const { data: first } = await supabase
+      .from("attivita")
+      .select("*")
+      .not("whatsapp", "is", null)
+      .limit(1)
+      .single();
+    return first;
+  }
+
+  return null;
+}
+
+// Carica o crea conversazione per questo numero + attivita
+async function getConversazione(telefono: string, attivitaId: string) {
   const { data } = await supabase
     .from("conversazioni_whatsapp")
     .select("*")
     .eq("telefono", telefono)
+    .eq("attivita_id", attivitaId)
     .single();
 
   if (data) {
@@ -46,7 +73,7 @@ async function getConversazione(telefono: string) {
   // Crea nuova conversazione
   const { data: nuova } = await supabase
     .from("conversazioni_whatsapp")
-    .insert({ telefono, messaggi: [] })
+    .insert({ telefono, attivita_id: attivitaId, messaggi: [] })
     .select()
     .single();
   return { id: nuova?.id, messaggi: [] };
@@ -77,21 +104,24 @@ export async function POST(request: NextRequest) {
     }
 
     const telefono = from.replace("whatsapp:", "");
+    const to = ((formData.get("To") as string) || "").replace("whatsapp:", "");
 
-    // Carica conversazione precedente
-    const conv = await getConversazione(telefono);
+    // Trova il ristorante dal numero WhatsApp di destinazione
+    const attivita = await findAttivitaByWhatsApp(to);
 
-    // Carica dati ristorante
-    const { data: attivita } = await supabase
-      .from("attivita")
-      .select("*")
-      .eq("id", ATTIVITA_ID)
-      .single();
+    if (!attivita) {
+      return twimlResponse("Questo numero non è ancora configurato. Contatta il supporto Reservi.");
+    }
+
+    const attivitaId = attivita.id;
+
+    // Carica conversazione precedente (scoped per attivita)
+    const conv = await getConversazione(telefono, attivitaId);
 
     const { data: turni } = await supabase
       .from("turni")
       .select("*")
-      .eq("attivita_id", ATTIVITA_ID)
+      .eq("attivita_id", attivitaId)
       .order("ordine");
 
     // Disponibilità oggi e domani
@@ -101,14 +131,14 @@ export async function POST(request: NextRequest) {
     const { data: prenOggi } = await supabase
       .from("prenotazioni")
       .select("*")
-      .eq("attivita_id", ATTIVITA_ID)
+      .eq("attivita_id", attivitaId)
       .eq("data", oggi)
       .in("stato", ["confermata", "in_attesa"]);
 
     const { data: prenDomani } = await supabase
       .from("prenotazioni")
       .select("*")
-      .eq("attivita_id", ATTIVITA_ID)
+      .eq("attivita_id", attivitaId)
       .eq("data", domani)
       .in("stato", ["confermata", "in_attesa"]);
 
@@ -125,6 +155,23 @@ export async function POST(request: NextRequest) {
       };
     });
 
+    // Carica prenotazioni future del cliente (per gestire disdette)
+    const { data: prenCliente } = await supabase
+      .from("prenotazioni")
+      .select("*")
+      .eq("attivita_id", attivitaId)
+      .eq("telefono_cliente", telefono)
+      .gte("data", oggi)
+      .in("stato", ["confermata", "in_attesa"])
+      .order("data");
+
+    const prenotazioniClienteStr = (prenCliente && prenCliente.length > 0)
+      ? prenCliente.map((p: { id: string; nome_cliente: string; data: string; ora: string; n_persone: number }) => {
+          const dataF = new Date(p.data + "T12:00:00").toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
+          return `- ${p.nome_cliente}, ${dataF} ore ${p.ora}, ${p.n_persone} persone [id: ${p.id}]`;
+        }).join("\n")
+      : "Nessuna prenotazione futura";
+
     const nomeAttivita = attivita?.nome || "il ristorante";
     const dataOggi = new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
     const dataDomani = new Date(Date.now() + 86400000).toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
@@ -139,6 +186,9 @@ TELEFONO: ${attivita?.telefono || "non specificato"}
 TURNI DISPONIBILI:
 ${disponibilita.map((d) => `- ${d.turno} (${d.orario}): oggi ${d.oggi_liberi > 0 ? d.oggi_liberi + " liberi" : "PIENO"}, domani ${d.domani_liberi > 0 ? d.domani_liberi + " liberi" : "PIENO"} [turno_id: ${d.turno_id}]`).join("\n")}
 
+PRENOTAZIONI ATTIVE DI QUESTO CLIENTE:
+${prenotazioniClienteStr}
+
 COME GESTIRE UNA PRENOTAZIONE:
 Per prenotare servono 4 informazioni. Chiedile UNA ALLA VOLTA se mancano:
 1. NOME (cognome del cliente) — chiedi sempre per primo: "A che nome la prenotazione?"
@@ -151,13 +201,25 @@ PRENOTA|nome_cliente|YYYY-MM-DD|HH:MM|numero_persone|turno_id|note
 
 Esempio: PRENOTA|Rossi|2026-04-18|20:00|4|abc-def-123|
 
+COME GESTIRE UNA DISDETTA:
+Se il cliente vuole cancellare/disdire una prenotazione:
+1. Cerca la prenotazione nelle PRENOTAZIONI ATTIVE DI QUESTO CLIENTE
+2. Se c'è una sola prenotazione, chiedi conferma: "Vuole cancellare la prenotazione per [data] alle [ora]?"
+3. Se ce ne sono più di una, chiedi quale vuole cancellare
+4. Quando il cliente conferma, rispondi SOLO con questo formato esatto:
+DISDETTA|prenotazione_id
+
+Esempio: DISDETTA|abc-123-def-456
+
+Se non ci sono prenotazioni attive, informa il cliente gentilmente.
+
 REGOLE:
 - Chiedi UNA informazione alla volta, non tutte insieme
 - Se un turno è pieno, proponi l'alternativa
 - Se il cliente chiede info (orari, indirizzo), rispondi normalmente
 - Mai inventare disponibilità
 - Max 200 caratteri per risposta
-- Non mostrare mai il formato PRENOTA al cliente, usalo solo quando hai tutti i dati`;
+- Non mostrare mai i formati PRENOTA o DISDETTA al cliente, usali solo quando hai tutti i dati`;
 
     // Costruisci i messaggi con la cronologia
     const messaggiClaude: Array<{ role: "user" | "assistant"; content: string }> = [];
@@ -176,6 +238,35 @@ REGOLE:
 
     const aiResponse = response.content[0].type === "text" ? response.content[0].text : "";
 
+    // Controlla se è un comando di disdetta
+    if (aiResponse.startsWith("DISDETTA|")) {
+      const parts = aiResponse.split("|");
+      const prenotazioneId = parts[1]?.trim();
+
+      if (prenotazioneId) {
+        const { data: pren, error } = await supabase
+          .from("prenotazioni")
+          .update({ stato: "disdetta" })
+          .eq("id", prenotazioneId)
+          .eq("attivita_id", attivitaId)
+          .select("nome_cliente, data, ora, n_persone")
+          .single();
+
+        if (error || !pren) {
+          conv.messaggi.push({ role: "user", content: body });
+          conv.messaggi.push({ role: "assistant", content: "Errore disdetta" });
+          await salvaMessaggi(conv.id, conv.messaggi);
+          return twimlResponse("Mi scusi, non sono riuscito a cancellare la prenotazione. Provi a chiamarci.");
+        }
+
+        const dataF = new Date(pren.data + "T12:00:00").toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
+        const conferma = `Prenotazione cancellata.\n\n${pren.nome_cliente}\n${dataF} ore ${pren.ora}\n${pren.n_persone} persone\n\nSperiamo di rivederla presto da ${nomeAttivita}!`;
+
+        await supabase.from("conversazioni_whatsapp").update({ messaggi: [], updated_at: new Date().toISOString() }).eq("id", conv.id);
+        return twimlResponse(conferma);
+      }
+    }
+
     // Controlla se è un comando di prenotazione
     if (aiResponse.startsWith("PRENOTA|")) {
       const parts = aiResponse.split("|");
@@ -184,7 +275,7 @@ REGOLE:
         const note = noteParts.join("|") || "";
 
         const { error } = await supabase.from("prenotazioni").insert({
-          attivita_id: ATTIVITA_ID,
+          attivita_id: attivitaId,
           nome_cliente: nome,
           telefono_cliente: telefono,
           data: data,
