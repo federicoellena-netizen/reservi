@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, LayoutDashboard, Settings, BarChart3, Sun, Moon } from "lucide-react";
+import { CalendarDays, LayoutDashboard, Settings, BarChart3, Sun, Moon, LogOut } from "lucide-react";
 import { LogoText } from "@/components/Logo";
 import { useTheme } from "@/lib/theme";
-import { getAttivita } from "@/lib/data";
+import { AuthProvider, useAuth } from "@/lib/auth-context";
 
 const navItems = [
   { href: "/dashboard", label: "Oggi", icon: LayoutDashboard },
@@ -15,20 +15,19 @@ const navItems = [
   { href: "/dashboard/impostazioni", label: "Impostazioni", icon: Settings },
 ];
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
-  const [nomeAttivita, setNomeAttivita] = useState("");
+  const { attivita, loading, signOut } = useAuth();
+  const [showLogout, setShowLogout] = useState(false);
 
-  useEffect(() => {
-    getAttivita().then(att => {
-      if (att) setNomeAttivita(att.nome);
-    });
-  }, []);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-primary)" }}>
+        <div className="text-sub text-sm">Caricamento...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--bg-primary)" }}>
@@ -46,9 +45,21 @@ export default function DashboardLayout({
               <Moon size={16} className="text-indigo-500" />
             )}
           </button>
-          <div className="card px-3 py-1.5 rounded-full">
-            <span className="text-xs text-sub">{nomeAttivita || "Reservi"}</span>
-          </div>
+          <button
+            onClick={() => setShowLogout(!showLogout)}
+            className="card px-3 py-1.5 rounded-full relative"
+          >
+            <span className="text-xs text-sub">{attivita?.nome || "Reservi"}</span>
+          </button>
+          {showLogout && (
+            <button
+              onClick={signOut}
+              className="card px-3 py-1.5 rounded-full flex items-center gap-1.5 text-red-400 hover:bg-red-500/10 transition-colors"
+            >
+              <LogOut size={12} />
+              <span className="text-xs font-medium">Esci</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -76,7 +87,6 @@ export default function DashboardLayout({
                 href={item.href}
                 className="relative flex flex-col items-center py-3 px-5 transition-all group"
               >
-                {/* Active indicator bar */}
                 {isActive && (
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full gradient-green shadow-lg shadow-green-500/30" />
                 )}
@@ -108,5 +118,17 @@ export default function DashboardLayout({
         </div>
       </nav>
     </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <AuthProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </AuthProvider>
   );
 }

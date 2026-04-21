@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { getPrenotazioniMese, type PrenotazioneDB } from "@/lib/data";
+import { useAuth } from "@/lib/auth-context";
 
 const giorniSettimana = ["L", "M", "M", "G", "V", "S", "D"];
 
 export default function CalendarioPage() {
+  const { attivita } = useAuth();
   const now = new Date();
   const [meseCorrente, setMeseCorrente] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
   const [prenotazioni, setPrenotazioni] = useState<PrenotazioneDB[]>([]);
@@ -25,10 +27,11 @@ export default function CalendarioPage() {
   const [giornoSel, setGiornoSel] = useState<string | null>(oggiStr);
 
   useEffect(() => {
+    if (!attivita) return;
     async function load() {
       setLoading(true);
       try {
-        const data = await getPrenotazioniMese(anno, mese);
+        const data = await getPrenotazioniMese(attivita!.id, anno, mese);
         setPrenotazioni(data);
       } catch (e) {
         console.error("Errore caricamento calendario:", e);
@@ -37,7 +40,7 @@ export default function CalendarioPage() {
       }
     }
     load();
-  }, [anno, mese]);
+  }, [attivita, anno, mese]);
 
   // Raggruppa prenotazioni per data
   const perData: Record<string, PrenotazioneDB[]> = {};

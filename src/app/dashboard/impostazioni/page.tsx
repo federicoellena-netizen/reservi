@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Save, Check, Plus, Trash2, GripVertical } from "lucide-react";
 import { getTurni, saveTurni, getAttivita, aggiornaAttivita, type TurnoDB, type AttivitaDB } from "@/lib/data";
 import { ShiftIcon, SHIFT_STYLES } from "@/components/ShiftIcon";
+import { useAuth } from "@/lib/auth-context";
 
 const giorniNomi = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"];
 
@@ -28,6 +29,7 @@ interface TurnoConfig {
 }
 
 export default function ImpostazioniPage() {
+  const { attivita: authAttivita } = useAuth();
   const [attivita, setAttivita] = useState({
     nome: "",
     tipo: "ristorante",
@@ -43,9 +45,10 @@ export default function ImpostazioniPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (!authAttivita) return;
     async function load() {
       try {
-        const [att, t] = await Promise.all([getAttivita(), getTurni()]);
+        const [att, t] = await Promise.all([getAttivita(authAttivita!.id), getTurni(authAttivita!.id)]);
         if (att) {
           setAttivita({
             nome: att.nome || "",
@@ -72,20 +75,21 @@ export default function ImpostazioniPage() {
       }
     }
     load();
-  }, []);
+  }, [authAttivita]);
 
   const handleSave = async () => {
+    if (!authAttivita) return;
     setSaving(true);
     try {
       await Promise.all([
-        aggiornaAttivita({
+        aggiornaAttivita(authAttivita.id, {
           nome: attivita.nome,
           tipo: attivita.tipo,
           indirizzo: attivita.indirizzo,
           telefono: attivita.telefono,
           whatsapp: attivita.whatsapp,
         }),
-        saveTurni(turni.map(t => ({
+        saveTurni(authAttivita.id, turni.map(t => ({
           id: t.id,
           nome: t.nome,
           inizio: t.inizio,

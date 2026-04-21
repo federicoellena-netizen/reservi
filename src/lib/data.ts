@@ -1,8 +1,5 @@
 import { supabase } from "./supabase";
 
-// ID attività di default (per sviluppo — sarà dinamico con auth)
-const ATTIVITA_ID = "00000000-0000-0000-0000-000000000001";
-
 // ============ TURNI ============
 
 export interface TurnoDB {
@@ -16,21 +13,20 @@ export interface TurnoDB {
   ordine: number;
 }
 
-export async function getTurni(): Promise<TurnoDB[]> {
+export async function getTurni(attivitaId: string): Promise<TurnoDB[]> {
   const { data, error } = await supabase
     .from("turni")
     .select("*")
-    .eq("attivita_id", ATTIVITA_ID)
+    .eq("attivita_id", attivitaId)
     .order("ordine");
   if (error) throw error;
   return data || [];
 }
 
-export async function saveTurni(turni: Omit<TurnoDB, "attivita_id">[]) {
-  // Usa upsert per aggiornare turni esistenti e inserire nuovi
+export async function saveTurni(attivitaId: string, turni: Omit<TurnoDB, "attivita_id">[]) {
   const rows = turni.map((t, i) => ({
     id: t.id,
-    attivita_id: ATTIVITA_ID,
+    attivita_id: attivitaId,
     nome: t.nome,
     inizio: t.inizio,
     fine: t.fine,
@@ -41,9 +37,8 @@ export async function saveTurni(turni: Omit<TurnoDB, "attivita_id">[]) {
   const { error } = await supabase.from("turni").upsert(rows);
   if (error) throw error;
 
-  // Rimuovi turni che non sono più nella lista
   const idsAttuali = turni.map(t => t.id);
-  const { data: tutti } = await supabase.from("turni").select("id").eq("attivita_id", ATTIVITA_ID);
+  const { data: tutti } = await supabase.from("turni").select("id").eq("attivita_id", attivitaId);
   if (tutti) {
     const daCancellare = tutti.filter(t => !idsAttuali.includes(t.id)).map(t => t.id);
     if (daCancellare.length > 0) {
@@ -71,25 +66,25 @@ export interface PrenotazioneDB {
   created_at: string;
 }
 
-export async function getPrenotazioniOggi(): Promise<PrenotazioneDB[]> {
+export async function getPrenotazioniOggi(attivitaId: string): Promise<PrenotazioneDB[]> {
   const oggi = new Date().toISOString().split("T")[0];
   const { data, error } = await supabase
     .from("prenotazioni")
     .select("*")
-    .eq("attivita_id", ATTIVITA_ID)
+    .eq("attivita_id", attivitaId)
     .eq("data", oggi)
     .order("ora");
   if (error) throw error;
   return data || [];
 }
 
-export async function getPrenotazioniMese(anno: number, mese: number): Promise<PrenotazioneDB[]> {
+export async function getPrenotazioniMese(attivitaId: string, anno: number, mese: number): Promise<PrenotazioneDB[]> {
   const inizio = `${anno}-${String(mese + 1).padStart(2, "0")}-01`;
   const fine = `${anno}-${String(mese + 1).padStart(2, "0")}-${new Date(anno, mese + 1, 0).getDate()}`;
   const { data, error } = await supabase
     .from("prenotazioni")
     .select("*")
-    .eq("attivita_id", ATTIVITA_ID)
+    .eq("attivita_id", attivitaId)
     .gte("data", inizio)
     .lte("data", fine)
     .order("data")
@@ -98,11 +93,11 @@ export async function getPrenotazioniMese(anno: number, mese: number): Promise<P
   return data || [];
 }
 
-export async function getPrenotazioniPeriodo(dataInizio: string, dataFine: string): Promise<PrenotazioneDB[]> {
+export async function getPrenotazioniPeriodo(attivitaId: string, dataInizio: string, dataFine: string): Promise<PrenotazioneDB[]> {
   const { data, error } = await supabase
     .from("prenotazioni")
     .select("*")
-    .eq("attivita_id", ATTIVITA_ID)
+    .eq("attivita_id", attivitaId)
     .gte("data", dataInizio)
     .lte("data", dataFine)
     .order("data")
@@ -111,7 +106,7 @@ export async function getPrenotazioniPeriodo(dataInizio: string, dataFine: strin
   return data || [];
 }
 
-export async function inserisciPrenotazione(pren: {
+export async function inserisciPrenotazione(attivitaId: string, pren: {
   nome_cliente: string;
   telefono_cliente?: string;
   data: string;
@@ -123,7 +118,7 @@ export async function inserisciPrenotazione(pren: {
   turno_id?: string;
 }) {
   const { data, error } = await supabase.from("prenotazioni").insert({
-    attivita_id: ATTIVITA_ID,
+    attivita_id: attivitaId,
     nome_cliente: pren.nome_cliente,
     telefono_cliente: pren.telefono_cliente || null,
     data: pren.data,
@@ -159,28 +154,28 @@ export interface AttivitaDB {
   coperti_totali: number | null;
 }
 
-export async function getAttivita(): Promise<AttivitaDB | null> {
+export async function getAttivita(attivitaId: string): Promise<AttivitaDB | null> {
   const { data, error } = await supabase
     .from("attivita")
     .select("*")
-    .eq("id", ATTIVITA_ID)
+    .eq("id", attivitaId)
     .single();
   if (error) return null;
   return data;
 }
 
-export async function aggiornaAttivita(updates: Partial<AttivitaDB>) {
+export async function aggiornaAttivita(attivitaId: string, updates: Partial<AttivitaDB>) {
   const { error } = await supabase
     .from("attivita")
     .update(updates)
-    .eq("id", ATTIVITA_ID);
+    .eq("id", attivitaId);
   if (error) throw error;
 }
 
 // ============ REPORT ============
 
-export async function getStatsMese(anno: number, mese: number) {
-  const prenotazioni = await getPrenotazioniMese(anno, mese);
+export async function getStatsMese(attivitaId: string, anno: number, mese: number) {
+  const prenotazioni = await getPrenotazioniMese(attivitaId, anno, mese);
 
   const attive = prenotazioni.filter(p => p.stato === "confermata" || p.stato === "completata");
   const totPersone = attive.reduce((s, p) => s + p.n_persone, 0);

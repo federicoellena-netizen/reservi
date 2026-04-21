@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import { TrendingUp, Users, CalendarCheck, XCircle, MessageSquare, Phone, Plus } from "lucide-react";
 import { getStatsMese } from "@/lib/data";
+import { useAuth } from "@/lib/auth-context";
 
 export default function ReportPage() {
+  const { attivita } = useAuth();
   const now = new Date();
   const [anno] = useState(now.getFullYear());
   const [mese] = useState(now.getMonth());
@@ -21,9 +23,10 @@ export default function ReportPage() {
   const nomeMese = new Date(anno, mese).toLocaleDateString("it-IT", { month: "long", year: "numeric" });
 
   useEffect(() => {
+    if (!attivita) return;
     async function load() {
       try {
-        const data = await getStatsMese(anno, mese);
+        const data = await getStatsMese(attivita!.id, anno, mese);
         setStats(data);
       } catch (e) {
         console.error("Errore caricamento report:", e);
@@ -32,7 +35,7 @@ export default function ReportPage() {
       }
     }
     load();
-  }, [anno, mese]);
+  }, [attivita, anno, mese]);
 
   if (loading || !stats) {
     return (

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Users, Phone, MessageSquare, X, Check, AlertTriangle, UserPlus, Minus, Clock, LogOut } from "lucide-react";
 import { getTurni, getPrenotazioniOggi, inserisciPrenotazione, aggiornaStatoPrenotazione, type TurnoDB, type PrenotazioneDB } from "@/lib/data";
 import { ShiftIcon, SHIFT_STYLES } from "@/components/ShiftIcon";
+import { useAuth } from "@/lib/auth-context";
 
 const statoConfig = {
   confermata: { label: "Confermata", dot: "bg-emerald-500", text: "text-emerald-500", bg: "bg-emerald-500/8" },
@@ -20,6 +21,7 @@ const fonteConfig = {
 };
 
 export default function DashboardOggi() {
+  const { attivita } = useAuth();
   const [turni, setTurni] = useState<TurnoDB[]>([]);
   const [prenotazioni, setPrenotazioni] = useState<PrenotazioneDB[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,9 +36,10 @@ export default function DashboardOggi() {
   const dataFormattata = oggi.toLocaleDateString("it-IT", { day: "numeric", month: "long" });
 
   useEffect(() => {
+    if (!attivita) return;
     async function load() {
       try {
-        const [t, p] = await Promise.all([getTurni(), getPrenotazioniOggi()]);
+        const [t, p] = await Promise.all([getTurni(attivita!.id), getPrenotazioniOggi(attivita!.id)]);
         setTurni(t);
         setPrenotazioni(p);
       } catch (e) {
@@ -46,7 +49,7 @@ export default function DashboardOggi() {
       }
     }
     load();
-  }, []);
+  }, [attivita]);
 
   const attive = prenotazioni.filter((p) => p.stato === "confermata" || p.stato === "in_attesa");
   const disdette = prenotazioni.filter((p) => p.stato === "disdetta");
@@ -84,9 +87,10 @@ export default function DashboardOggi() {
   const primoTurnoLibero = turniInfo.find((t) => !t.pieno);
 
   const handleWalkin = async (turnoId: string) => {
+    if (!attivita) return;
     const turno = turni.find((t) => t.id === turnoId)!;
     try {
-      const nuova = await inserisciPrenotazione({
+      const nuova = await inserisciPrenotazione(attivita.id, {
         nome_cliente: "Walk-in",
         data: oggiStr,
         ora: turno.inizio,
@@ -104,9 +108,9 @@ export default function DashboardOggi() {
   };
 
   const handleAggiungi = async () => {
-    if (!nuovaForm.nome_cliente || !nuovaForm.ora || !nuovaForm.turno_id) return;
+    if (!attivita || !nuovaForm.nome_cliente || !nuovaForm.ora || !nuovaForm.turno_id) return;
     try {
-      const nuova = await inserisciPrenotazione({
+      const nuova = await inserisciPrenotazione(attivita.id, {
         nome_cliente: nuovaForm.nome_cliente,
         telefono_cliente: nuovaForm.telefono_cliente,
         data: oggiStr,
