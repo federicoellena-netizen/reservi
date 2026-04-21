@@ -3,32 +3,44 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { MessageSquare, BarChart3, Clock, Users, Zap, ArrowRight, Check, Star, ChevronRight } from "lucide-react";
+import { MessageSquare, BarChart3, Clock, Users, Zap, ArrowRight, Check, Star, ChevronRight, Globe, TrendingUp } from "lucide-react";
 
 const features = [
   {
     icon: MessageSquare,
     color: "#22c55e",
-    title: "AI su WhatsApp",
-    desc: "Un assistente intelligente risponde ai tuoi clienti 24/7, prende prenotazioni e gestisce le richieste in automatico.",
+    title: "AI su WhatsApp 24/7",
+    desc: "Un assistente risponde ai tuoi clienti in 10 secondi, prende prenotazioni e gestisce le richieste. Anche alle 23, anche di domenica.",
   },
   {
     icon: BarChart3,
     color: "#3b82f6",
-    title: "Dashboard in tempo reale",
-    desc: "Vedi prenotazioni, coperti, turni e statistiche dal telefono. Tutto aggiornato al secondo.",
+    title: "Dashboard e report",
+    desc: "Vedi prenotazioni, coperti, turni dal telefono. Report mensili con insight: giorni forti, giorni deboli, trend, dove migliorare.",
   },
   {
     icon: Clock,
     color: "#f59e0b",
     title: "Reminder automatici",
-    desc: "Il sistema avvisa i clienti prima della prenotazione. Riduce i no-show fino al 60%.",
+    desc: "Il sistema avvisa i clienti il giorno prima su WhatsApp. Riduce i no-show fino al 50%. Meno tavoli vuoti.",
+  },
+  {
+    icon: Globe,
+    color: "#8b5cf6",
+    title: "Sito web + dominio tuo",
+    desc: "Ti realizziamo un sito professionale su www.tuoristorante.it con prenotazione WhatsApp in un tap. Incluso nel piano Professional.",
+  },
+  {
+    icon: TrendingUp,
+    color: "#ec4899",
+    title: "Insight AI sul tuo locale",
+    desc: "Coperti al giorno, giorno piu forte vs piu debole, andamento mensile e annuale. Dati concreti per capire dove migliorare e guadagnare di piu.",
   },
   {
     icon: Users,
     color: "#a855f7",
     title: "Storico clienti",
-    desc: "Ogni cliente ha il suo profilo: preferenze, allergie, prenotazioni passate. L'AI ricorda tutto.",
+    desc: "Ogni cliente ha il suo profilo: preferenze, allergie, prenotazioni passate. L'AI ricorda tutto per un servizio personalizzato.",
   },
 ];
 
@@ -40,20 +52,29 @@ const steps = [
 
 const pricing = [
   {
-    name: "Lancio",
+    name: "Starter",
     price: "49",
-    badge: "Primi 10 clienti",
-    desc: "Tutto incluso, zero costi nascosti",
-    features: ["AI WhatsApp 24/7", "Dashboard completa", "Prenotazioni illimitate", "Reminder automatici", "Report e statistiche", "Setup gratuito", "Supporto dedicato"],
-    cta: "Inizia gratis per 30 giorni",
-    highlighted: true,
+    badge: null,
+    desc: "WhatsApp AI + Dashboard",
+    features: ["AI WhatsApp 24/7", "Dashboard completa", "Prenotazioni illimitate", "Report e statistiche", "Link prenotazione Google", "Setup gratuito"],
+    cta: "Primo mese gratis",
+    highlighted: false,
   },
   {
     name: "Professional",
     price: "99",
+    badge: "Consigliato",
+    desc: "Tutto + Sito web con il tuo dominio",
+    features: ["Tutto dello Starter +", "Realizzazione sito web professionale", "Dominio personalizzato (tuoristorante.it)", "Design e colori personalizzati", "Report avanzati con insight AI", "Reminder automatici WhatsApp", "Ottimizzazione mobile e Google"],
+    cta: "Primo mese gratis",
+    highlighted: true,
+  },
+  {
+    name: "Premium",
+    price: "149",
     badge: null,
     desc: "Per chi vuole il massimo",
-    features: ["Tutto del piano Lancio", "Multi-sede", "Landing page personalizzata", "Integrazione Google Calendar", "Storico clienti avanzato", "API personalizzate", "Supporto prioritario"],
+    features: ["Tutto del Professional +", "SEO avanzato per Google", "Supporto prioritario dedicato", "Formazione staff inclusa", "Report personalizzati su misura", "Consulenza marketing digitale"],
     cta: "Contattaci",
     highlighted: false,
   },
@@ -76,9 +97,12 @@ const testimonials = [
 
 const faqs = [
   { q: "Come funziona l'assistente AI?", a: "L'assistente risponde automaticamente su WhatsApp ai tuoi clienti. Chiede le informazioni necessarie, controlla la disponibilita e conferma la prenotazione. Tu vedi tutto in dashboard." },
+  { q: "Il primo mese e davvero gratis?", a: "Si, completamente gratuito. Lo provi senza impegno per un mese intero. Se non sei soddisfatto, smetti e non paghi nulla. Nessuna carta richiesta." },
+  { q: "Come funziona il sito web?", a: "Con il piano Professional realizziamo un sito professionale su www.tuoristorante.it. Include design personalizzato, mappa, orari, specialita e pulsante per prenotare su WhatsApp. Ci occupiamo noi di tutto: dominio, configurazione e messa online." },
   { q: "Devo cambiare il mio numero WhatsApp?", a: "No. L'assistente funziona con il tuo numero WhatsApp Business. I clienti scrivono al tuo numero di sempre." },
-  { q: "Quanto ci vuole per attivarlo?", a: "Meno di 10 minuti. Configuriamo tutto noi: turni, coperti, orari. Tu devi solo dirci come funziona la tua attivita." },
+  { q: "Quanto ci vuole per attivarlo?", a: "Meno di 10 minuti per l'assistente WhatsApp e la dashboard. Il sito web viene realizzato in pochi giorni dopo la raccolta delle informazioni." },
   { q: "Posso ancora gestire le prenotazioni manualmente?", a: "Certo. La dashboard ti permette di aggiungere prenotazioni manuali, walk-in e telefonate. L'AI e il manuale convivono perfettamente." },
+  { q: "Che dati posso vedere nei report?", a: "Coperti giornalieri, settimanali, mensili. Giorno piu forte e piu debole. Tasso di no-show. Percentuale prenotazioni WhatsApp vs walk-in. Andamento nel tempo con confronto tra mesi. Insight AI su dove migliorare." },
   { q: "E se l'AI sbaglia?", a: "L'AI lavora solo con i dati reali: turni, coperti, disponibilita. Non inventa. E puoi sempre modificare o cancellare una prenotazione dalla dashboard." },
 ];
 
@@ -125,7 +149,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="#pricing" className="gradient-green text-white px-8 py-4 rounded-2xl text-lg font-semibold hover:opacity-90 transition-opacity shadow-xl shadow-green-500/20 flex items-center gap-2">
-              Prova gratis 30 giorni
+              Primo mese gratis
               <ArrowRight size={20} />
             </a>
             <a href="#come-funziona" className="card px-8 py-4 rounded-2xl text-lg font-medium text-sub hover:text-main transition-colors flex items-center gap-2">
@@ -135,9 +159,9 @@ export default function Home() {
           </div>
 
           <div className="flex items-center justify-center gap-6 mt-10 text-sm text-dim">
-            <span className="flex items-center gap-1.5"><Check size={14} className="text-emerald-500" /> Nessuna carta richiesta</span>
+            <span className="flex items-center gap-1.5"><Check size={14} className="text-emerald-500" /> Primo mese gratuito</span>
             <span className="flex items-center gap-1.5"><Check size={14} className="text-emerald-500" /> Setup in 10 minuti</span>
-            <span className="flex items-center gap-1.5"><Check size={14} className="text-emerald-500" /> Cancella quando vuoi</span>
+            <span className="flex items-center gap-1.5"><Check size={14} className="text-emerald-500" /> Zero commissioni</span>
           </div>
         </div>
       </section>
@@ -223,7 +247,7 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl font-bold text-main mb-3">Tutto quello che ti serve</h2>
             <p className="text-sub">Nessun software complicato. Apri, guarda, gestisci.</p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {features.map((f) => {
               const Icon = f.icon;
               return (
@@ -286,14 +310,130 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Sito Web */}
+      <section className="py-20 px-5">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-2xl sm:text-3xl font-bold text-main mb-3">Il tuo sito web professionale</h2>
+            <p className="text-sub">Realizziamo il tuo sito con dominio personalizzato. Incluso nel piano Professional.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-8 items-center">
+            <div>
+              <div className="space-y-5">
+                {[
+                  { title: "Dominio personalizzato", desc: "www.tuoristorante.it — non un link generico. Il tuo indirizzo web professionale." },
+                  { title: "Design su misura", desc: "Colori, stile e contenuti personalizzati sulla tua attivita. Perfetto su mobile e desktop." },
+                  { title: "Prenotazione in un tap", desc: "Pulsante 'Prenota su WhatsApp' sempre visibile. Dal sito alla prenotazione in un click." },
+                  { title: "Pronto per Google", desc: "Ottimizzato per i motori di ricerca. Chi cerca ristoranti nella tua zona ti trova." },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <Check size={18} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="text-main font-semibold text-sm">{item.title}</h4>
+                      <p className="text-sub text-sm">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="card rounded-3xl p-6">
+              <div className="text-xs text-dim mb-3 text-center">Esempio sito realizzato</div>
+              <div className="rounded-2xl overflow-hidden" style={{ background: "var(--bg-input)" }}>
+                <div className="h-3 flex items-center gap-1.5 px-3" style={{ background: "var(--bg-card-border)" }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                </div>
+                <div className="p-5 space-y-4">
+                  <div className="text-center">
+                    <div className="text-xs text-dim mb-1">www.ristorantedamario.it</div>
+                    <div className="text-main font-bold text-lg">Ristorante Da Mario</div>
+                    <div className="text-sub text-xs">Cucina tradizionale italiana dal 1985</div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["Pasta fresca", "Pesce del giorno", "Dolci artigianali"].map((s) => (
+                      <div key={s} className="card rounded-lg p-2 text-center">
+                        <div className="text-xs text-sub">{s}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="gradient-green text-white text-center py-2.5 rounded-xl text-sm font-semibold">
+                    Prenota su WhatsApp
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Report e Insight */}
+      <section className="py-20 px-5" style={{ background: "var(--bg-card)" }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-2xl sm:text-3xl font-bold text-main mb-3">Dati concreti sul tuo locale</h2>
+            <p className="text-sub">Sai quanti coperti fai il martedi rispetto al sabato? Con Reservi lo vedi nero su bianco.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-8 items-start">
+            <div className="card rounded-3xl p-6">
+              <div className="text-xs text-emerald-500 font-semibold mb-4 uppercase tracking-wider">Report mensile</div>
+              <div className="grid grid-cols-3 gap-3 mb-5">
+                {[
+                  { val: "847", label: "Coperti" },
+                  { val: "94%", label: "Presenza" },
+                  { val: "+12%", label: "vs mese scorso" },
+                ].map((m) => (
+                  <div key={m.label} className="text-center p-3 rounded-xl" style={{ background: "var(--bg-input)" }}>
+                    <div className="text-xl font-bold text-emerald-500">{m.val}</div>
+                    <div className="text-[10px] text-dim mt-1">{m.label}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-3">
+                {[
+                  { label: "Giorno piu forte", value: "Sabato", badge: "142 coperti", color: "text-emerald-500" },
+                  { label: "Giorno piu debole", value: "Martedi", badge: "38 coperti", color: "text-red-400" },
+                  { label: "No-show", value: "6 su 102", badge: "5.9%", color: "text-red-400" },
+                  { label: "Via WhatsApp", value: "78 prenot.", badge: "76%", color: "text-emerald-500" },
+                ].map((row) => (
+                  <div key={row.label} className="flex items-center justify-between text-sm">
+                    <span className="text-dim">{row.label}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-main font-medium">{row.value}</span>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${row.color}`} style={{ background: "var(--bg-input)" }}>{row.badge}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-5">
+              {[
+                { title: "Coperti al giorno, settimana, mese", desc: "Vedi esattamente quanti clienti servi e come cambia nel tempo. Confronta mesi e scopri i trend." },
+                { title: "Giorni forti e giorni deboli", desc: "Scopri che il martedi fai solo 38 coperti. Lancia un'offerta e vedi subito se funziona." },
+                { title: "Tasso no-show e impatto", desc: "Quanti clienti non si presentano? Quanto ti costa? Con i reminder automatici li riduci del 50%." },
+                { title: "Insight AI per migliorare", desc: "Il sistema analizza i tuoi dati e ti suggerisce dove hai margine per crescere: turni, giorni, promozioni." },
+              ].map((item) => (
+                <div key={item.title} className="flex items-start gap-3">
+                  <TrendingUp size={18} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="text-main font-semibold text-sm">{item.title}</h4>
+                    <p className="text-sub text-sm">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="py-20 px-5" style={{ background: "var(--bg-card)" }}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-2xl sm:text-3xl font-bold text-main mb-3">Prezzi semplici, zero sorprese</h2>
-            <p className="text-sub">Tutto incluso. Nessun costo per prenotazione.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-main mb-3">Primo mese gratis. Poi prezzi semplici.</h2>
+            <p className="text-sub">Zero costi di setup. Zero commissioni per prenotazione. Disdici quando vuoi.</p>
           </div>
-          <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
             {pricing.map((p) => (
               <div key={p.name} className={`card rounded-3xl p-7 relative ${p.highlighted ? "border-emerald-500/30" : ""}`}>
                 {p.badge && (
@@ -353,7 +493,7 @@ export default function Home() {
           <div className="card rounded-3xl p-10 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 gradient-green" />
             <h2 className="text-2xl font-bold text-main mb-3">Pronto a non perdere piu prenotazioni?</h2>
-            <p className="text-sub text-sm mb-8">Attivazione in 10 minuti. 30 giorni gratis. Zero rischio.</p>
+            <p className="text-sub text-sm mb-8">Primo mese gratis. Setup in 10 minuti. Zero rischio.</p>
             <a
               href="https://wa.me/393407024769?text=Ciao!%20Vorrei%20provare%20Reservi"
               target="_blank"
