@@ -27,9 +27,9 @@ export default function OffertaPage() {
           <h2 className="text-2xl font-bold mb-6 pb-3 border-b-2 border-[#22c55e]">Il problema che risolviamo</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {[
-              { title: "WhatsApp senza risposta", desc: "I clienti scrivono ma nessuno risponde subito — soprattutto durante il servizio." },
-              { title: "Telefonate perse", desc: "Quando sei impegnato in sala, le chiamate vanno a vuoto. Ogni chiamata persa e' un tavolo vuoto." },
-              { title: "Gestione manuale", desc: "Agenda cartacea, foglietti, messaggi sparsi. Rischio di doppie prenotazioni." },
+              { title: "WhatsApp senza risposta", desc: "I clienti scrivono ma nessuno risponde subito — soprattutto durante il servizio, la sera e nel weekend." },
+              { title: "Prenotazioni perse", desc: "Ogni messaggio WhatsApp non risposto in tempo e' un cliente che va da un altro. E sono il 70% delle prenotazioni." },
+              { title: "Gestione manuale", desc: "Agenda cartacea, foglietti, messaggi sparsi. Rischio di doppie prenotazioni e confusione." },
               { title: "Nessuna presenza online", desc: "Chi ti cerca su Google non trova un sito professionale con un modo facile per prenotare." },
             ].map((item) => (
               <div key={item.title} className="bg-gray-50 rounded-xl p-5 border border-gray-100">
