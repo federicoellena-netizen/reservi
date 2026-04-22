@@ -125,36 +125,35 @@ export async function POST(request: NextRequest) {
       .eq("attivita_id", attivitaId)
       .order("ordine");
 
-    // Disponibilità oggi e domani
+    // Disponibilità prossimi 7 giorni
     const oggi = new Date().toISOString().split("T")[0];
-    const domani = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+    const tra7gg = new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0];
 
-    const { data: prenOggi } = await supabase
+    const { data: prenSettimana } = await supabase
       .from("prenotazioni")
       .select("*")
       .eq("attivita_id", attivitaId)
-      .eq("data", oggi)
+      .gte("data", oggi)
+      .lte("data", tra7gg)
       .in("stato", ["confermata", "in_attesa"]);
 
-    const { data: prenDomani } = await supabase
-      .from("prenotazioni")
-      .select("*")
-      .eq("attivita_id", attivitaId)
-      .eq("data", domani)
-      .in("stato", ["confermata", "in_attesa"]);
+    // Genera disponibilita per ogni giorno x turno
+    const giorniDisp: string[] = [];
+    for (let d = 0; d < 7; d++) {
+      const dataObj = new Date(Date.now() + d * 86400000);
+      const dataStr = dataObj.toISOString().split("T")[0];
+      const nomeGiorno = dataObj.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
 
-    const disponibilita = (turni || []).map((turno) => {
-      const occOggi = (prenOggi || []).filter((p) => p.turno_id === turno.id).reduce((s: number, p: { n_persone: number }) => s + p.n_persone, 0);
-      const occDomani = (prenDomani || []).filter((p) => p.turno_id === turno.id).reduce((s: number, p: { n_persone: number }) => s + p.n_persone, 0);
-      return {
-        turno: turno.nome,
-        turno_id: turno.id,
-        orario: `${turno.inizio}-${turno.fine}`,
-        coperti: turno.coperti,
-        oggi_liberi: turno.coperti - occOggi,
-        domani_liberi: turno.coperti - occDomani,
-      };
-    });
+      const righe = (turni || []).map((turno) => {
+        const occ = (prenSettimana || []).filter((p) => p.turno_id === turno.id && p.data === dataStr).reduce((s: number, p: { n_persone: number }) => s + p.n_persone, 0);
+        const liberi = turno.coperti - occ;
+        return `  - ${turno.nome} (${turno.inizio}-${turno.fine}): ${liberi > 0 ? liberi + " liberi" : "PIENO"} [turno_id: ${turno.id}]`;
+      });
+
+      giorniDisp.push(`${nomeGiorno} (${dataStr}):\n${righe.join("\n")}`);
+    }
+
+    const disponibilitaStr = giorniDisp.join("\n\n");
 
     // Carica prenotazioni future del cliente (per gestire disdette)
     const { data: prenCliente } = await supabase
@@ -175,17 +174,15 @@ export async function POST(request: NextRequest) {
 
     const nomeAttivita = attivita?.nome || "il ristorante";
     const dataOggi = new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
-    const dataDomani = new Date(Date.now() + 86400000).toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
 
     const systemPrompt = `Sei l'assistente WhatsApp di "${nomeAttivita}". Sei cordiale, professionale e conciso. Rispondi come un cameriere esperto al telefono — frasi brevi, mai più di 2-3 frasi.
 
 OGGI: ${dataOggi} (${oggi})
-DOMANI: ${dataDomani} (${domani})
 INDIRIZZO: ${attivita?.indirizzo || "non specificato"}
 TELEFONO: ${attivita?.telefono || "non specificato"}
 
-TURNI DISPONIBILI:
-${disponibilita.map((d) => `- ${d.turno} (${d.orario}): oggi ${d.oggi_liberi > 0 ? d.oggi_liberi + " liberi" : "PIENO"}, domani ${d.domani_liberi > 0 ? d.domani_liberi + " liberi" : "PIENO"} [turno_id: ${d.turno_id}]`).join("\n")}
+DISPONIBILITA' PROSSIMI 7 GIORNI:
+${disponibilitaStr}
 
 PRENOTAZIONI ATTIVE DI QUESTO CLIENTE:
 ${prenotazioniClienteStr}
