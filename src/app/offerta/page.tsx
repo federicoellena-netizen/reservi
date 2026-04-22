@@ -11,8 +11,7 @@ export default function OffertaPage() {
       {/* Header */}
       <header className="bg-gradient-to-br from-[#0a0a1a] to-[#0f1a2e] text-white py-16 px-6 text-center">
         <div className="max-w-3xl mx-auto">
-          <div className="w-14 h-14 bg-[#22c55e] rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6">R</div>
-          <h1 className="text-4xl font-bold mb-3">Reservi</h1>
+          <img src="/logo-reservi-dark.png" alt="Reservi" className="h-16 mx-auto mb-6 rounded-xl" />
           <p className="text-white/60 text-lg">Prenotazioni intelligenti via WhatsApp per il tuo ristorante</p>
           <div className="mt-6 inline-block bg-[#22c55e]/15 border border-[#22c55e]/30 text-[#4ade80] px-6 py-2 rounded-full text-sm font-semibold">
             Primo mese completamente gratuito
@@ -175,8 +174,7 @@ export default function OffertaPage() {
 
       {/* Footer */}
       <footer className="bg-gray-50 border-t border-gray-200 py-8 px-6 text-center">
-        <div className="w-8 h-8 bg-[#22c55e] rounded-lg flex items-center justify-center text-white font-bold text-sm mx-auto mb-3">R</div>
-        <p className="text-sm font-semibold">Reservi</p>
+        <img src="/logo-reservi-dark.png" alt="Reservi" className="h-10 mx-auto mb-3 rounded-lg" />
         <p className="text-xs text-gray-400 mt-1">Prenotazioni intelligenti via WhatsApp</p>
       </footer>
     </div>

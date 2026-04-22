@@ -37,8 +37,7 @@ export default function DemoPage() {
       <div className="max-w-2xl mx-auto px-5 pt-8 pb-4">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#22c55e] rounded-xl flex items-center justify-center text-sm font-bold text-black">R</div>
-            <span className="font-bold tracking-tight">Reservi</span>
+            <img src="/logo-reservi-dark.png" alt="Reservi" className="h-8 rounded-lg" />
           </div>
           <span className="text-xs text-gray-500">Ristorante Da Mario</span>
         </div>
@@ -255,8 +254,7 @@ export default function DemoPage() {
         {/* FOOTER */}
         <div className="text-center py-6 border-t border-white/5">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-6 h-6 bg-[#22c55e] rounded-lg flex items-center justify-center text-[10px] font-bold text-black">R</div>
-            <span className="text-sm font-bold">Reservi</span>
+            <img src="/logo-reservi-dark.png" alt="Reservi" className="h-7 rounded-md" />
           </div>
           <p className="text-xs text-gray-600">Prenotazioni intelligenti via WhatsApp</p>
           <a href="https://reservi-two.vercel.app" className="text-xs text-[#22c55e] mt-2 inline-block hover:underline">reservi-two.vercel.app</a>
