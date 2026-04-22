@@ -152,6 +152,12 @@ export interface AttivitaDB {
   whatsapp: string | null;
   orari: unknown;
   coperti_totali: number | null;
+  onboarding_completato?: boolean;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
+  piano?: string | null;
+  piano_scadenza?: string | null;
+  trial_fine?: string | null;
 }
 
 export async function getAttivita(attivitaId: string): Promise<AttivitaDB | null> {

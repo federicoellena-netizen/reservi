@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
+import { sendWhatsApp } from "@/lib/twilio";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -263,6 +264,17 @@ REGOLE:
         const conferma = `Prenotazione cancellata.\n\n${pren.nome_cliente}\n${dataF} ore ${pren.ora}\n${pren.n_persone} persone\n\nSperiamo di rivederla presto da ${nomeAttivita}!`;
 
         await supabase.from("conversazioni_whatsapp").update({ messaggi: [], updated_at: new Date().toISOString() }).eq("id", conv.id);
+
+        // Notifica disdetta al titolare
+        const ownerNumD = attivita.whatsapp || attivita.telefono;
+        if (ownerNumD && ownerNumD !== telefono) {
+          try {
+            await sendWhatsApp(ownerNumD, `Disdetta via WhatsApp\n\n${pren.nome_cliente}\n${dataF} ore ${pren.ora}\n${pren.n_persone} persone`);
+          } catch (e) {
+            console.error("Errore notifica disdetta titolare:", e);
+          }
+        }
+
         return twimlResponse(conferma);
       }
     }
@@ -301,6 +313,16 @@ REGOLE:
 
         // Salva conversazione e resettala (prenotazione completata)
         await supabase.from("conversazioni_whatsapp").update({ messaggi: [], updated_at: new Date().toISOString() }).eq("id", conv.id);
+
+        // Notifica al titolare
+        const ownerNum = attivita.whatsapp || attivita.telefono;
+        if (ownerNum && ownerNum !== telefono) {
+          try {
+            await sendWhatsApp(ownerNum, `Nuova prenotazione WhatsApp!\n\n${nome}\n${dataFormattata}\nOre ${ora}\n${persone} persone${note ? `\nNote: ${note}` : ""}`);
+          } catch (e) {
+            console.error("Errore notifica titolare:", e);
+          }
+        }
 
         return twimlResponse(conferma);
       }

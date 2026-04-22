@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, LayoutDashboard, Settings, BarChart3, Sun, Moon, LogOut } from "lucide-react";
+import { CalendarDays, LayoutDashboard, Settings, BarChart3, CreditCard, Sun, Moon, LogOut } from "lucide-react";
 import { LogoText } from "@/components/Logo";
 import { useTheme } from "@/lib/theme";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
@@ -12,6 +12,7 @@ const navItems = [
   { href: "/dashboard", label: "Oggi", icon: LayoutDashboard },
   { href: "/dashboard/calendario", label: "Calendario", icon: CalendarDays },
   { href: "/dashboard/report", label: "Report", icon: BarChart3 },
+  { href: "/dashboard/billing", label: "Piano", icon: CreditCard },
   { href: "/dashboard/impostazioni", label: "Impostazioni", icon: Settings },
 ];
 
