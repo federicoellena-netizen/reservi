@@ -112,10 +112,7 @@ export default function Home() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50" style={{ background: "var(--nav-bg)", backdropFilter: "blur(24px)", borderBottom: "1px solid var(--nav-border)" }}>
         <div className="max-w-5xl mx-auto px-5 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Logo size="sm" />
-            <span className="font-bold text-main tracking-tight">Reservi</span>
-          </div>
+          <Logo size="md" />
           <div className="hidden sm:flex items-center gap-8 text-sm text-sub">
             <a href="#features" className="hover:text-main transition-colors">Funzionalita</a>
             <a href="#come-funziona" className="hover:text-main transition-colors">Come funziona</a>
@@ -510,10 +507,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-10 px-5" style={{ borderTop: "1px solid var(--bg-card-border)" }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <Logo size="sm" />
-            <span className="font-bold text-main tracking-tight">Reservi</span>
-          </div>
+          <Logo size="md" />
           <div className="flex items-center gap-6 text-sm text-dim">
             <a href="#features" className="hover:text-sub transition-colors">Funzionalita</a>
             <a href="#pricing" className="hover:text-sub transition-colors">Prezzi</a>
