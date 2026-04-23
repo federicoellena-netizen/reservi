@@ -10,7 +10,7 @@ const giorniNomi = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì",
 
 const orariDefault = giorniNomi.map((g, i) => ({
   giorno: g,
-  aperto: i < 6,
+  aperto: true,
   pranzo_inizio: "12:30",
   pranzo_fine: "15:00",
   cena_inizio: "19:30",
