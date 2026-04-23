@@ -158,6 +158,7 @@ export interface AttivitaDB {
   piano?: string | null;
   piano_scadenza?: string | null;
   trial_fine?: string | null;
+  info_extra?: string | null;
 }
 
 export async function getAttivita(attivitaId: string): Promise<AttivitaDB | null> {

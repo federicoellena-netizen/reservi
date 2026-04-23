@@ -36,6 +36,7 @@ export default function ImpostazioniPage() {
     indirizzo: "",
     telefono: "",
     whatsapp: "",
+    info_extra: "",
   });
 
   const [turni, setTurni] = useState<TurnoConfig[]>([]);
@@ -56,6 +57,7 @@ export default function ImpostazioniPage() {
             indirizzo: att.indirizzo || "",
             telefono: att.telefono || "",
             whatsapp: att.whatsapp || "",
+            info_extra: att.info_extra || "",
           });
         }
         if (t.length > 0) {
@@ -88,6 +90,7 @@ export default function ImpostazioniPage() {
           indirizzo: attivita.indirizzo,
           telefono: attivita.telefono,
           whatsapp: attivita.whatsapp,
+          info_extra: attivita.info_extra || null,
         }),
         saveTurni(authAttivita.id, turni.map(t => ({
           id: t.id,
@@ -191,6 +194,20 @@ export default function ImpostazioniPage() {
             <InputField label="WhatsApp" value={attivita.whatsapp} onChange={(v) => setAttivita({ ...attivita, whatsapp: v })} />
           </div>
         </div>
+      </div>
+
+      {/* Info per Assistente WhatsApp */}
+      <div className="card rounded-2xl p-5">
+        <h3 className="font-semibold text-main mb-1 text-sm">Informazioni per l'Assistente AI</h3>
+        <p className="text-xs text-dim mb-4">Scrivi tutto ciò che l'assistente WhatsApp deve sapere sulla tua attività. I clienti potranno chiedere queste informazioni via chat.</p>
+        <textarea
+          value={attivita.info_extra}
+          onChange={(e) => setAttivita({ ...attivita, info_extra: e.target.value })}
+          rows={8}
+          className="w-full input rounded-xl px-4 py-3 text-sm resize-y"
+          placeholder={`Esempi di informazioni utili:\n- Parcheggio: Sì, gratuito nel cortile interno\n- Celiaci: Menù dedicato senza glutine disponibile\n- Animali: Ammessi solo in terrazza esterna\n- Pagamenti: Contanti e carte, no Amex\n- Bambini: Seggioloni disponibili (max 4)\n- Eventi: Musica live ogni venerdì sera\n- Specialità: Pesce fresco, pizza napoletana`}
+        />
+        <p className="text-[10px] text-dim mt-2">Se un cliente chiede qualcosa non presente qui, l'assistente lo inviterà a chiamare direttamente.</p>
       </div>
 
       {/* Gestione Turni */}

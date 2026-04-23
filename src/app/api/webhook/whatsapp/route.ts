@@ -175,11 +175,14 @@ export async function POST(request: NextRequest) {
     const nomeAttivita = attivita?.nome || "il ristorante";
     const dataOggi = new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
 
+    const infoExtra = attivita?.info_extra || "";
+
     const systemPrompt = `Sei l'assistente WhatsApp di "${nomeAttivita}". Sei cordiale, professionale e conciso. Rispondi come un cameriere esperto al telefono — frasi brevi, mai più di 2-3 frasi.
 
 OGGI: ${dataOggi} (${oggi})
 INDIRIZZO: ${attivita?.indirizzo || "non specificato"}
 TELEFONO: ${attivita?.telefono || "non specificato"}
+${infoExtra ? `\nINFORMAZIONI SULL'ATTIVITA':\n${infoExtra}\n` : ""}
 
 DISPONIBILITA' PROSSIMI 7 GIORNI:
 ${disponibilitaStr}
@@ -214,8 +217,9 @@ Se non ci sono prenotazioni attive, informa il cliente gentilmente.
 REGOLE:
 - Chiedi UNA informazione alla volta, non tutte insieme
 - Se un turno è pieno, proponi l'alternativa
-- Se il cliente chiede info (orari, indirizzo), rispondi normalmente
-- Mai inventare disponibilità
+- Se il cliente chiede info presenti nelle INFORMAZIONI SULL'ATTIVITA', rispondi con quelle informazioni
+- Se il cliente chiede qualcosa che NON è nelle informazioni fornite, rispondi: "Non ho questa informazione, ma può chiamarci al ${attivita?.telefono || "ristorante"} e saremo felici di aiutarla!"
+- Mai inventare informazioni o disponibilità
 - Max 200 caratteri per risposta
 - Non mostrare mai i formati PRENOTA o DISDETTA al cliente, usali solo quando hai tutti i dati`;
 
