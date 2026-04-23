@@ -35,21 +35,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(user);
 
       if (user) {
-        // Try to find attivita linked to this user
-        let { data } = await supabase
+        // Try to find attivita linked to this user (limit 1 per evitare errori con duplicati)
+        const { data: attivitaList } = await supabase
           .from("attivita")
           .select("id, nome, tipo")
           .eq("user_id", user.id)
-          .single();
+          .limit(1);
+
+        let data = attivitaList && attivitaList.length > 0 ? attivitaList[0] : null;
 
         if (!data) {
           // Fallback: check for unlinked attivita and claim it (first user setup)
-          const { data: unlinked } = await supabase
+          const { data: unlinkedList } = await supabase
             .from("attivita")
             .select("id, nome, tipo")
             .is("user_id", null)
-            .limit(1)
-            .single();
+            .limit(1);
+
+          const unlinked = unlinkedList && unlinkedList.length > 0 ? unlinkedList[0] : null;
 
           if (unlinked) {
             await supabase
@@ -57,21 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .update({ user_id: user.id })
               .eq("id", unlinked.id);
             data = unlinked;
-          } else {
-            // Create new attivita for this user
-            const nome = user.user_metadata?.nome || "La mia attivita";
-            const { data: nuova } = await supabase
-              .from("attivita")
-              .insert({
-                user_id: user.id,
-                nome,
-                tipo: "ristorante",
-                onboarding_completato: false,
-              })
-              .select("id, nome, tipo")
-              .single();
-            data = nuova;
           }
+          // Non creare automaticamente una nuova attivita — evita duplicati
         }
 
         if (data) {
