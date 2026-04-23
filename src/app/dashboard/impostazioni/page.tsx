@@ -203,19 +203,25 @@ export default function ImpostazioniPage() {
       {/* Giorni di Apertura */}
       <div className="card rounded-2xl p-5">
         <h3 className="font-semibold text-main mb-4 text-sm">Giorni di Apertura</h3>
-        <div className="grid grid-cols-7 gap-2">
+        <div className="flex flex-wrap gap-2">
           {orari.map((o, i) => (
             <button
               key={o.giorno}
               onClick={() => toggleGiorno(i)}
-              className={`flex flex-col items-center py-3 rounded-xl transition-all border ${
-                o.aperto
-                  ? "bg-[#22c55e]/15 text-[#22c55e] border-[#22c55e]/30"
-                  : "bg-red-500/10 text-red-400 border-red-500/20"
-              }`}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "10px 14px",
+                borderRadius: "12px",
+                border: o.aperto ? "1.5px solid rgba(34,197,94,0.4)" : "1.5px solid rgba(239,68,68,0.3)",
+                background: o.aperto ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.08)",
+                color: o.aperto ? "#22c55e" : "#ef4444",
+                minWidth: "48px",
+              }}
             >
-              <span className="text-xs font-semibold">{o.giorno.slice(0, 3)}</span>
-              <span className="text-[10px] mt-1">{o.aperto ? "Aperto" : "Chiuso"}</span>
+              <span style={{ fontSize: "12px", fontWeight: 700 }}>{o.giorno.slice(0, 3)}</span>
+              <span style={{ fontSize: "10px", marginTop: "2px", opacity: 0.8 }}>{o.aperto ? "Aperto" : "Chiuso"}</span>
             </button>
           ))}
         </div>
