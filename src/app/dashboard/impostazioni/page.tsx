@@ -59,7 +59,7 @@ export default function ImpostazioniPage() {
             whatsapp: att.whatsapp || "",
             info_extra: att.info_extra || "",
           });
-          if (att.orari && Array.isArray(att.orari)) {
+          if (att.orari && Array.isArray(att.orari) && att.orari.length === 7) {
             setOrari(att.orari as typeof orariDefault);
           }
         }

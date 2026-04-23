@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
 
     // Mappa giorni di apertura (0=Domenica in JS, ma orari è 0=Lunedì)
     // Converte: orari[0]=Lunedì → JS day 1, orari[6]=Domenica → JS day 0
-    const orariAttivita = Array.isArray(attivita?.orari) ? attivita.orari : null;
+    const orariAttivita = Array.isArray(attivita?.orari) && attivita.orari.length === 7 ? attivita.orari : null;
     const giorniAperti = new Set<number>();
     if (orariAttivita) {
       orariAttivita.forEach((o: { aperto: boolean }, i: number) => {
