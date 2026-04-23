@@ -62,7 +62,7 @@ const pricing = [
   },
   {
     name: "Professional",
-    price: "99",
+    price: "69",
     badge: "Consigliato",
     desc: "Tutto + Sito web con il tuo dominio",
     features: ["Tutto dello Starter +", "Realizzazione sito web professionale", "Dominio personalizzato (tuoristorante.it)", "Design e colori personalizzati", "Report avanzati con insight AI", "Reminder automatici WhatsApp", "Ottimizzazione mobile e Google"],
@@ -84,7 +84,7 @@ const testimonials = [
   {
     name: "Marco R.",
     role: "Ristorante Da Marco, Torino",
-    text: "Prima perdevo prenotazioni perche non potevo rispondere al telefono durante il servizio. Ora l'AI risponde per me, anche alle 2 di notte.",
+    text: "Prima perdevo prenotazioni perche non riuscivo a rispondere ai messaggi durante il servizio. Ora l'AI risponde per me, anche alle 2 di notte.",
     stars: 5,
   },
   {
@@ -141,7 +141,7 @@ export default function Home() {
           </h1>
 
           <p className="text-lg sm:text-xl text-sub max-w-xl mx-auto mb-10 leading-relaxed">
-            Un assistente AI risponde su WhatsApp ai tuoi clienti, prende prenotazioni e ti mostra tutto in una dashboard. Zero chiamate perse, zero stress.
+            Un assistente AI risponde su WhatsApp ai tuoi clienti, prende prenotazioni e ti mostra tutto in una dashboard. Zero messaggi persi, zero stress.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -205,8 +205,8 @@ export default function Home() {
               <h3 className="text-red-400 font-semibold mb-4 text-sm">Senza Reservi</h3>
               <ul className="space-y-3 text-sm text-sub">
                 {[
-                  "Clienti chiamano durante il servizio — nessuno risponde",
                   "Messaggi WhatsApp che si accumulano — rispondi dopo ore",
+                  "Clienti scrivono di sera e nel weekend — nessuno risponde",
                   "No-show: il 15% dei tavoli resta vuoto",
                   "Nessun dato su chi prenota di piu o quando",
                   "Sabato sera: caos totale",

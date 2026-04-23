@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { CalendarDays, LayoutDashboard, Settings, BarChart3, CreditCard, Sun, Moon, LogOut } from "lucide-react";
 import { LogoText } from "@/components/Logo";
 import { useTheme } from "@/lib/theme";
@@ -18,11 +18,18 @@ const navItems = [
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, toggle } = useTheme();
-  const { attivita, loading, signOut } = useAuth();
+  const { user, attivita, loading, signOut } = useAuth();
   const [showLogout, setShowLogout] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [loading, user, router]);
+
+  if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-primary)" }}>
         <div className="text-sub text-sm">Caricamento...</div>
