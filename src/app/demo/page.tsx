@@ -257,7 +257,7 @@ export default function DemoPage() {
             <img src="/logo-reservi-dark.png" alt="Reservi" className="h-7 rounded-md" />
           </div>
           <p className="text-xs text-gray-600">Prenotazioni intelligenti via WhatsApp</p>
-          <a href="https://reservi-two.vercel.app" className="text-xs text-[#22c55e] mt-2 inline-block hover:underline">reservi-two.vercel.app</a>
+          <a href="https://getreservi.com" className="text-xs text-[#22c55e] mt-2 inline-block hover:underline">getreservi.com</a>
         </div>
       </div>
     </div>

@@ -340,7 +340,7 @@ export default function SitoRistorante({ attivita, turni }: { attivita: Attivita
             {attivita.telefono && <span>{attivita.telefono}</span>}
           </div>
           <div className="text-xs text-gray-700">
-            Prenotazioni by <a href="https://reservi-two.vercel.app" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors" style={{ color: colore }}>Reservi</a>
+            Prenotazioni by <a href="https://getreservi.com" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors" style={{ color: colore }}>Reservi</a>
           </div>
         </div>
       </footer>

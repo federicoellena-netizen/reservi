@@ -89,7 +89,7 @@ export default function OffertaPage() {
           </div>
 
           <div className="mt-4 text-center">
-            <a href="https://reservi-two.vercel.app/s/ristorante-da-mario" target="_blank" rel="noopener noreferrer" className="text-[#22c55e] font-semibold text-sm hover:underline">
+            <a href="https://getreservi.com/s/ristorante-da-mario" target="_blank" rel="noopener noreferrer" className="text-[#22c55e] font-semibold text-sm hover:underline">
               Vedi il sito demo completo →
             </a>
           </div>
@@ -167,7 +167,7 @@ export default function OffertaPage() {
         {/* Il nostro sito */}
         <section className="text-center mb-8">
           <p className="text-sm text-gray-400">
-            Scopri di piu' su <a href="https://reservi-two.vercel.app" target="_blank" rel="noopener noreferrer" className="text-[#22c55e] font-semibold hover:underline">reservi-two.vercel.app</a>
+            Scopri di piu' su <a href="https://getreservi.com" target="_blank" rel="noopener noreferrer" className="text-[#22c55e] font-semibold hover:underline">getreservi.com</a>
           </p>
         </section>
       </div>
