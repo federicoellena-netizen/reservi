@@ -161,7 +161,7 @@ export default function OffertaPage() {
           >
             Scrivici su WhatsApp
           </a>
-          <p className="text-xs text-gray-400 mt-4">Oppure scrivi a info@reservi.it</p>
+          <p className="text-xs text-gray-400 mt-4">Oppure scrivi a info@getreservi.com</p>
         </section>
 
         {/* Il nostro sito */}

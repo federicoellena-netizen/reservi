@@ -511,7 +511,7 @@ export default function Home() {
           <div className="flex items-center gap-6 text-sm text-dim">
             <a href="#features" className="hover:text-sub transition-colors">Funzionalita</a>
             <a href="#pricing" className="hover:text-sub transition-colors">Prezzi</a>
-            <a href="mailto:info@reservi.app" className="hover:text-sub transition-colors">Contatti</a>
+            <a href="mailto:info@getreservi.com" className="hover:text-sub transition-colors">Contatti</a>
           </div>
           <div className="text-xs text-dim">
             &copy; 2026 Reservi. Tutti i diritti riservati.
