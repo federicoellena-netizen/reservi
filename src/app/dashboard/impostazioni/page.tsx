@@ -200,6 +200,28 @@ export default function ImpostazioniPage() {
         </div>
       </div>
 
+      {/* Giorni di Apertura */}
+      <div className="card rounded-2xl p-5">
+        <h3 className="font-semibold text-main mb-4 text-sm">Giorni di Apertura</h3>
+        <div className="grid grid-cols-7 gap-2">
+          {orari.map((o, i) => (
+            <button
+              key={o.giorno}
+              onClick={() => toggleGiorno(i)}
+              className={`flex flex-col items-center py-3 rounded-xl transition-all ${
+                o.aperto
+                  ? "bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20"
+                  : "card text-dim border border-transparent"
+              }`}
+            >
+              <span className="text-xs font-semibold">{o.giorno.slice(0, 3)}</span>
+              <span className="text-[10px] mt-1">{o.aperto ? "Aperto" : "Chiuso"}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-[10px] text-dim mt-3">Tocca un giorno per aprirlo o chiuderlo. I turni configurati sotto si applicano a tutti i giorni aperti.</p>
+      </div>
+
       {/* Info per Assistente WhatsApp */}
       <div className="card rounded-2xl p-5">
         <h3 className="font-semibold text-main mb-1 text-sm">Informazioni per l'Assistente AI</h3>
@@ -321,32 +343,6 @@ export default function ImpostazioniPage() {
         </div>
       </div>
 
-      {/* Orari apertura */}
-      <div className="card rounded-2xl p-5">
-        <h3 className="font-semibold text-main mb-4 text-sm">Giorni di Apertura</h3>
-        <div className="space-y-2">
-          {orari.map((o, i) => (
-            <div key={o.giorno} className="flex items-center gap-3">
-              <button
-                onClick={() => toggleGiorno(i)}
-                className={`min-w-[52px] text-xs font-semibold py-2 rounded-xl transition-all ${
-                  o.aperto
-                    ? "bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20"
-                    : "card text-dim"
-                }`}
-              >
-                {o.giorno.slice(0, 3)}
-              </button>
-              {o.aperto ? (
-                <span className="text-xs text-[#22c55e]">Aperto</span>
-              ) : (
-                <span className="text-xs text-dim">Chiuso</span>
-              )}
-            </div>
-          ))}
-        </div>
-        <p className="text-[10px] text-dim mt-3">I turni configurati sopra si applicano a tutti i giorni aperti. Per gestire turni diversi per giorno, contattaci.</p>
-      </div>
 
       {/* WhatsApp status */}
       <div className="card rounded-2xl p-5">
