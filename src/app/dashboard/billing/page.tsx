@@ -15,14 +15,14 @@ const piani = [
   {
     key: "professional",
     name: "Professional",
-    price: 99,
+    price: 69,
     badge: "Consigliato",
     features: ["Tutto di Starter +", "Sito web professionale", "Dominio personalizzato", "Report AI + Insight", "Reminder automatici"],
   },
   {
     key: "premium",
     name: "Premium",
-    price: 149,
+    price: 99,
     features: ["Tutto di Professional +", "SEO avanzato Google", "Supporto prioritario", "Formazione staff", "Consulenza marketing"],
   },
 ];

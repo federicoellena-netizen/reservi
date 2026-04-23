@@ -11,12 +11,12 @@ export const PLANS = {
   professional: {
     name: "Professional",
     priceId: process.env.STRIPE_PRICE_PROFESSIONAL || "",
-    price: 99,
+    price: 69,
   },
   premium: {
     name: "Premium",
     priceId: process.env.STRIPE_PRICE_PREMIUM || "",
-    price: 149,
+    price: 99,
   },
 } as const;
 

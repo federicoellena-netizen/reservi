@@ -71,7 +71,7 @@ const pricing = [
   },
   {
     name: "Premium",
-    price: "149",
+    price: "99",
     badge: null,
     desc: "Per chi vuole il massimo",
     features: ["Tutto del Professional +", "SEO avanzato per Google", "Supporto prioritario dedicato", "Formazione staff inclusa", "Report personalizzati su misura", "Consulenza marketing digitale"],

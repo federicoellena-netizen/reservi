@@ -129,8 +129,8 @@ export default function OffertaPage() {
           <div className="grid sm:grid-cols-3 gap-4">
             {[
               { name: "Starter", price: "49", desc: "WhatsApp AI + Dashboard", features: ["AI WhatsApp 24/7", "Dashboard completa", "Report base", "Link Google"] },
-              { name: "Professional", price: "99", desc: "Tutto + Sito web + Dominio", badge: true, features: ["Tutto di Starter +", "Sito web professionale", "Dominio personalizzato", "Report AI + Insight", "Reminder automatici"] },
-              { name: "Premium", price: "149", desc: "Per chi vuole il massimo", features: ["Tutto di Professional +", "SEO avanzato", "Supporto prioritario", "Formazione staff"] },
+              { name: "Professional", price: "69", desc: "Tutto + Sito web + Dominio", badge: true, features: ["Tutto di Starter +", "Sito web professionale", "Dominio personalizzato", "Report AI + Insight", "Reminder automatici"] },
+              { name: "Premium", price: "99", desc: "Per chi vuole il massimo", features: ["Tutto di Professional +", "SEO avanzato", "Supporto prioritario", "Formazione staff"] },
             ].map((plan) => (
               <div key={plan.name} className={`rounded-2xl p-5 text-center border ${plan.badge ? "border-[#22c55e] bg-[#f0fdf4]" : "border-gray-200"} relative`}>
                 {plan.badge && <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#22c55e] text-white text-[10px] font-bold px-3 py-0.5 rounded-full uppercase">Consigliato</div>}
