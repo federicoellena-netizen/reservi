@@ -208,10 +208,10 @@ export default function ImpostazioniPage() {
             <button
               key={o.giorno}
               onClick={() => toggleGiorno(i)}
-              className={`flex flex-col items-center py-3 rounded-xl transition-all ${
+              className={`flex flex-col items-center py-3 rounded-xl transition-all border ${
                 o.aperto
-                  ? "bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20"
-                  : "card text-dim border border-transparent"
+                  ? "bg-[#22c55e]/15 text-[#22c55e] border-[#22c55e]/30"
+                  : "bg-red-500/10 text-red-400 border-red-500/20"
               }`}
             >
               <span className="text-xs font-semibold">{o.giorno.slice(0, 3)}</span>
