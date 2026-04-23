@@ -59,6 +59,9 @@ export default function ImpostazioniPage() {
             whatsapp: att.whatsapp || "",
             info_extra: att.info_extra || "",
           });
+          if (att.orari && Array.isArray(att.orari)) {
+            setOrari(att.orari as typeof orariDefault);
+          }
         }
         if (t.length > 0) {
           setTurni(t.map(turno => ({
@@ -91,6 +94,7 @@ export default function ImpostazioniPage() {
           telefono: attivita.telefono,
           whatsapp: attivita.whatsapp,
           info_extra: attivita.info_extra || null,
+          orari: orari,
         }),
         saveTurni(authAttivita.id, turni.map(t => ({
           id: t.id,

@@ -137,12 +137,32 @@ export async function POST(request: NextRequest) {
       .lte("data", tra7gg)
       .in("stato", ["confermata", "in_attesa"]);
 
+    // Mappa giorni di apertura (0=Domenica in JS, ma orari è 0=Lunedì)
+    // Converte: orari[0]=Lunedì → JS day 1, orari[6]=Domenica → JS day 0
+    const orariAttivita = Array.isArray(attivita?.orari) ? attivita.orari : null;
+    const giorniAperti = new Set<number>();
+    if (orariAttivita) {
+      orariAttivita.forEach((o: { aperto: boolean }, i: number) => {
+        if (o.aperto) {
+          // orari[0]=Lunedì=JS 1, orari[1]=Martedì=JS 2, ... orari[6]=Domenica=JS 0
+          giorniAperti.add(i === 6 ? 0 : i + 1);
+        }
+      });
+    }
+
     // Genera disponibilita per ogni giorno x turno
     const giorniDisp: string[] = [];
     for (let d = 0; d < 7; d++) {
       const dataObj = new Date(Date.now() + d * 86400000);
       const dataStr = dataObj.toISOString().split("T")[0];
       const nomeGiorno = dataObj.toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
+      const jsDay = dataObj.getDay(); // 0=Domenica, 1=Lunedì, ...
+
+      // Se i giorni di apertura sono configurati e questo giorno è chiuso, segnalo CHIUSO
+      if (orariAttivita && !giorniAperti.has(jsDay)) {
+        giorniDisp.push(`${nomeGiorno} (${dataStr}): CHIUSO`);
+        continue;
+      }
 
       const righe = (turni || []).map((turno) => {
         const occ = (prenSettimana || []).filter((p) => p.turno_id === turno.id && p.data === dataStr).reduce((s: number, p: { n_persone: number }) => s + p.n_persone, 0);
@@ -216,6 +236,7 @@ Se non ci sono prenotazioni attive, informa il cliente gentilmente.
 
 REGOLE:
 - Chiedi UNA informazione alla volta, non tutte insieme
+- Se un giorno è CHIUSO, informa il cliente e proponi il giorno aperto più vicino
 - Se un turno è pieno, proponi l'alternativa
 - Se il cliente chiede info presenti nelle INFORMAZIONI SULL'ATTIVITA', rispondi con quelle informazioni
 - Se il cliente chiede qualcosa che NON è nelle informazioni fornite, rispondi: "Non ho questa informazione, ma può chiamarci al ${attivita?.telefono || "ristorante"} e saremo felici di aiutarla!"
