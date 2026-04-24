@@ -91,9 +91,11 @@ export default function OsteriaBertoldoDemo() {
       }}>
         <div className="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
           <a href="#" className="flex items-center gap-3">
-            <img src={FOTO.logo} alt={NOME} className="h-14 rounded-lg" />
-            <div className="hidden sm:block">
-              <div className="font-display text-xl font-bold" style={{ color: "#1e1214" }}>Osteria il Bertoldo</div>
+            <div className="rounded-xl overflow-hidden shadow-md" style={{ background: "#1e1214", padding: "6px" }}>
+              <img src={FOTO.logo} alt={NOME} className="h-12 w-auto object-contain" style={{ display: "block" }} />
+            </div>
+            <div>
+              <div className="font-display text-lg sm:text-xl font-bold" style={{ color: "#1e1214" }}>Osteria il Bertoldo</div>
               <div className="font-body text-[10px] uppercase tracking-[0.2em]" style={{ color: "#8a5a5e" }}>Verona &middot; Dal 1988</div>
             </div>
           </a>
@@ -443,7 +445,9 @@ export default function OsteriaBertoldoDemo() {
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-6">
             <div className="flex items-center gap-3">
-              <img src={FOTO.logo} alt={NOME} className="h-10 rounded-lg opacity-80" />
+              <div className="rounded-lg overflow-hidden" style={{ background: "#1e1214", padding: "4px" }}>
+                <img src={FOTO.logo} alt={NOME} className="h-8 w-auto object-contain" style={{ display: "block" }} />
+              </div>
               <span className="font-display text-lg font-bold text-white/70">Osteria il Bertoldo</span>
             </div>
             <div className="flex items-center gap-4 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
