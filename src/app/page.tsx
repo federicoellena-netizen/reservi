@@ -512,6 +512,8 @@ export default function Home() {
             <a href="#features" className="hover:text-sub transition-colors">Funzionalita</a>
             <a href="#pricing" className="hover:text-sub transition-colors">Prezzi</a>
             <a href="mailto:info@getreservi.com" className="hover:text-sub transition-colors">Contatti</a>
+            <a href="/privacy" className="hover:text-sub transition-colors">Privacy</a>
+            <a href="/termini" className="hover:text-sub transition-colors">Termini</a>
           </div>
           <div className="text-xs text-dim">
             &copy; 2026 Reservi. Tutti i diritti riservati.
