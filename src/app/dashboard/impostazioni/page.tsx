@@ -37,6 +37,8 @@ export default function ImpostazioniPage() {
     telefono: "",
     whatsapp: "",
     info_extra: "",
+    link_tripadvisor: "",
+    link_google: "",
   });
 
   const [turni, setTurni] = useState<TurnoConfig[]>([]);
@@ -58,6 +60,8 @@ export default function ImpostazioniPage() {
             telefono: att.telefono || "",
             whatsapp: att.whatsapp || "",
             info_extra: att.info_extra || "",
+            link_tripadvisor: att.link_tripadvisor || "",
+            link_google: att.link_google || "",
           });
           if (att.orari && Array.isArray(att.orari) && att.orari.length === 7) {
             setOrari(att.orari as typeof orariDefault);
@@ -94,6 +98,8 @@ export default function ImpostazioniPage() {
           telefono: attivita.telefono,
           whatsapp: attivita.whatsapp,
           info_extra: attivita.info_extra || null,
+          link_tripadvisor: attivita.link_tripadvisor || null,
+          link_google: attivita.link_google || null,
           orari: orari,
         }),
         saveTurni(authAttivita.id, turni.map(t => ({
@@ -240,6 +246,17 @@ export default function ImpostazioniPage() {
           placeholder={`Esempi di informazioni utili:\n- Parcheggio: Sì, gratuito nel cortile interno\n- Celiaci: Menù dedicato senza glutine disponibile\n- Animali: Ammessi solo in terrazza esterna\n- Pagamenti: Contanti e carte, no Amex\n- Bambini: Seggioloni disponibili (max 4)\n- Eventi: Musica live ogni venerdì sera\n- Specialità: Pesce fresco, pizza napoletana`}
         />
         <p className="text-[10px] text-dim mt-2">Se un cliente chiede qualcosa non presente qui, l'assistente lo inviterà a chiamare direttamente.</p>
+      </div>
+
+      {/* Link Recensioni */}
+      <div className="card rounded-2xl p-5">
+        <h3 className="font-semibold text-main mb-1 text-sm">Richiesta Recensioni</h3>
+        <p className="text-xs text-dim mb-4">Dopo il pasto, il cliente riceve un messaggio WhatsApp con il link per lasciare una recensione. Inserisci i link delle tue pagine.</p>
+        <div className="space-y-4">
+          <InputField label="Link Google Business (recensioni)" value={attivita.link_google} onChange={(v) => setAttivita({ ...attivita, link_google: v })} />
+          <InputField label="Link TripAdvisor" value={attivita.link_tripadvisor} onChange={(v) => setAttivita({ ...attivita, link_tripadvisor: v })} />
+        </div>
+        <p className="text-[10px] text-dim mt-3">Quando segni un cliente come &quot;Uscito&quot;, ricevera un messaggio con i link per la recensione.</p>
       </div>
 
       {/* Gestione Turni */}

@@ -69,6 +69,15 @@ export default function DashboardOggi() {
     try {
       await aggiornaStatoPrenotazione(id, nuovoStato);
       setPrenotazioni(prenotazioni.map(p => p.id === id ? { ...p, stato: nuovoStato } : p));
+
+      // Se il cliente e' uscito, invia richiesta recensione via WhatsApp
+      if (nuovoStato === "completata" && attivita) {
+        fetch("/api/recensione", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prenotazioneId: id, attivitaId: attivita.id }),
+        }).catch(() => {}); // Non bloccare se fallisce
+      }
     } catch (e) {
       console.error("Errore cambio stato:", e);
     }
