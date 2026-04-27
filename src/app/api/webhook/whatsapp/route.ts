@@ -37,12 +37,13 @@ async function findAttivitaByWhatsApp(toNumber: string) {
 
   if (data) return data;
 
-  // Fallback sandbox: se il numero è quello sandbox Twilio, usa la prima attivita configurata
+  // Fallback sandbox: se il numero è quello sandbox Twilio, usa la prima attivita con un user_id (attiva)
   if (toNumber === TWILIO_SANDBOX_NUMBER || toNumber === "") {
     const { data: first } = await supabase
       .from("attivita")
       .select("*")
       .not("whatsapp", "is", null)
+      .not("user_id", "is", null)
       .limit(1)
       .single();
     return first;
