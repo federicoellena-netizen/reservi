@@ -161,6 +161,7 @@ export interface AttivitaDB {
   info_extra?: string | null;
   link_tripadvisor?: string | null;
   link_google?: string | null;
+  whatsapp_titolare?: string | null;
 }
 
 export async function getAttivita(attivitaId: string): Promise<AttivitaDB | null> {

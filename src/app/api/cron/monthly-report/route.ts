@@ -31,17 +31,17 @@ export async function GET(request: NextRequest) {
     const inizio = `${anno}-${String(mese + 1).padStart(2, "0")}-01`;
     const fine = `${anno}-${String(mese + 1).padStart(2, "0")}-${new Date(anno, mese + 1, 0).getDate()}`;
 
-    // Prendi tutte le attivita attive con un numero WhatsApp
+    // Prendi tutte le attivita con whatsapp_titolare configurato
     const { data: attivitaList } = await supabase
       .from("attivita")
-      .select("id, nome, whatsapp, telefono")
-      .not("whatsapp", "is", null);
+      .select("id, nome, whatsapp_titolare, whatsapp, telefono")
+      .not("user_id", "is", null);
 
     let reportInviati = 0;
     let errori = 0;
 
     for (const att of attivitaList || []) {
-      const ownerNum = att.whatsapp || att.telefono;
+      const ownerNum = att.whatsapp_titolare || att.whatsapp || att.telefono;
       if (!ownerNum) continue;
 
       // Prendi prenotazioni del mese

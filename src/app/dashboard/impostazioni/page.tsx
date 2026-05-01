@@ -39,6 +39,7 @@ export default function ImpostazioniPage() {
     info_extra: "",
     link_tripadvisor: "",
     link_google: "",
+    whatsapp_titolare: "",
   });
 
   const [turni, setTurni] = useState<TurnoConfig[]>([]);
@@ -62,6 +63,7 @@ export default function ImpostazioniPage() {
             info_extra: att.info_extra || "",
             link_tripadvisor: att.link_tripadvisor || "",
             link_google: att.link_google || "",
+            whatsapp_titolare: att.whatsapp_titolare || "",
           });
           if (att.orari && Array.isArray(att.orari) && att.orari.length === 7) {
             setOrari(att.orari as typeof orariDefault);
@@ -100,6 +102,7 @@ export default function ImpostazioniPage() {
           info_extra: attivita.info_extra || null,
           link_tripadvisor: attivita.link_tripadvisor || null,
           link_google: attivita.link_google || null,
+          whatsapp_titolare: attivita.whatsapp_titolare || null,
           orari: orari,
         }),
         saveTurni(authAttivita.id, turni.map(t => ({
@@ -204,6 +207,13 @@ export default function ImpostazioniPage() {
             <InputField label="WhatsApp" value={attivita.whatsapp} onChange={(v) => setAttivita({ ...attivita, whatsapp: v })} />
           </div>
         </div>
+      </div>
+
+      {/* WhatsApp Titolare */}
+      <div className="card rounded-2xl p-5">
+        <h3 className="font-semibold text-main mb-1 text-sm">Notifiche WhatsApp Titolare</h3>
+        <p className="text-xs text-dim mb-4">Inserisci il tuo numero personale per ricevere notifiche su ogni prenotazione e gestire tutto direttamente da WhatsApp. Puoi scrivere &quot;prenotazioni&quot; per la lista del giorno, oppure &quot;Rossi è uscito&quot; per aggiornare lo stato.</p>
+        <InputField label="WhatsApp titolare (con prefisso, es. +393331234567)" value={attivita.whatsapp_titolare} onChange={(v) => setAttivita({ ...attivita, whatsapp_titolare: v })} />
       </div>
 
       {/* Giorni di Apertura */}

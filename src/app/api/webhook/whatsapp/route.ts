@@ -52,6 +52,16 @@ async function findAttivitaByWhatsApp(toNumber: string) {
   return null;
 }
 
+// Trova l'attivita dal numero del titolare (per messaggi dal titolare)
+async function findAttivitaByTitolare(telefono: string) {
+  const { data } = await supabase
+    .from("attivita")
+    .select("*")
+    .eq("whatsapp_titolare", telefono)
+    .single();
+  return data;
+}
+
 // Carica o crea conversazione per questo numero + attivita
 async function getConversazione(telefono: string, attivitaId: string) {
   const { data } = await supabase
@@ -91,6 +101,149 @@ async function salvaMessaggi(convId: string, messaggi: Array<{ role: string; con
     .eq("id", convId);
 }
 
+// Invia notifica al titolare
+export async function notificaTitolare(attivita: { whatsapp_titolare?: string | null; whatsapp?: string | null; telefono?: string | null }, messaggio: string) {
+  const numero = attivita.whatsapp_titolare;
+  if (!numero) return;
+  try {
+    await sendWhatsApp(numero, messaggio);
+  } catch (e) {
+    console.error("Errore notifica titolare:", e);
+  }
+}
+
+// ============ GESTIONE MESSAGGI TITOLARE ============
+
+async function handleMessaggioTitolare(body: string, attivita: Record<string, unknown>) {
+  const attivitaId = attivita.id as string;
+  const nomeAttivita = (attivita.nome as string) || "il ristorante";
+  const oggi = new Date().toISOString().split("T")[0];
+
+  // Carica prenotazioni di oggi
+  const { data: prenOggi } = await supabase
+    .from("prenotazioni")
+    .select("*")
+    .eq("attivita_id", attivitaId)
+    .eq("data", oggi)
+    .in("stato", ["confermata", "in_attesa", "completata", "no_show"])
+    .order("ora");
+
+  const { data: turni } = await supabase
+    .from("turni")
+    .select("*")
+    .eq("attivita_id", attivitaId)
+    .order("ordine");
+
+  // Costruisci lista prenotazioni per il prompt
+  const listaStr = (prenOggi || []).map((p) => {
+    const turno = (turni || []).find((t) => t.id === p.turno_id);
+    const turnoNome = turno ? turno.nome : "";
+    return `- [${p.id}] ${p.nome_cliente}, ore ${p.ora}, ${p.n_persone} pers, ${turnoNome}, stato: ${p.stato}${p.telefono_cliente ? `, tel: ${p.telefono_cliente}` : ""}`;
+  }).join("\n") || "Nessuna prenotazione oggi";
+
+  const dataOggi = new Date().toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" });
+
+  const systemPrompt = `Sei l'assistente gestionale di "${nomeAttivita}" per il TITOLARE. Rispondi in modo diretto e conciso.
+
+OGGI: ${dataOggi} (${oggi})
+
+PRENOTAZIONI DI OGGI:
+${listaStr}
+
+COMANDI CHE PUOI ESEGUIRE:
+1. Se il titolare chiede la lista/situazione prenotazioni → mostra un riepilogo chiaro delle prenotazioni di oggi
+2. Se il titolare dice che un cliente "è uscito" / "ha finito" / "completato" → rispondi SOLO con: USCITO|id_prenotazione
+3. Se il titolare dice che un cliente "non si è presentato" / "no show" → rispondi SOLO con: NOSHOW|id_prenotazione
+4. Se il titolare vuole disdire una prenotazione → rispondi SOLO con: DISDETTA|id_prenotazione
+5. Se il titolare chiede quanti posti liberi → calcola dai turni e prenotazioni
+
+REGOLE:
+- Interpreta il nome del cliente anche se scritto in modo approssimativo (es. "rosi" = "Rossi")
+- Se ci sono più clienti con nome simile, chiedi quale
+- I formati USCITO|, NOSHOW|, DISDETTA| devono contenere l'id esatto della prenotazione
+- Per la lista, usa un formato leggibile con emoji:
+  ✅ confermata, ⏳ in attesa, 🚶 completata (uscito), ❌ no show
+- Max 500 caratteri per risposta
+- Non mostrare mai gli ID al titolare`;
+
+  const response = await anthropic.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 400,
+    system: systemPrompt,
+    messages: [{ role: "user", content: body }],
+  });
+
+  const aiResponse = response.content[0].type === "text" ? response.content[0].text : "";
+
+  // Gestisci comandi strutturati
+  if (aiResponse.startsWith("USCITO|")) {
+    const prenId = aiResponse.split("|")[1]?.trim();
+    return await aggiornaStatoTitolare(prenId, "completata", attivitaId, nomeAttivita);
+  }
+  if (aiResponse.startsWith("NOSHOW|")) {
+    const prenId = aiResponse.split("|")[1]?.trim();
+    return await aggiornaStatoTitolare(prenId, "no_show", attivitaId, nomeAttivita);
+  }
+  if (aiResponse.startsWith("DISDETTA|")) {
+    const prenId = aiResponse.split("|")[1]?.trim();
+    return await aggiornaStatoTitolare(prenId, "disdetta", attivitaId, nomeAttivita);
+  }
+
+  return twimlResponse(aiResponse);
+}
+
+async function aggiornaStatoTitolare(prenId: string, nuovoStato: string, attivitaId: string, nomeAttivita: string) {
+  if (!prenId) return twimlResponse("Non ho trovato la prenotazione. Riprova.");
+
+  const { data: pren, error } = await supabase
+    .from("prenotazioni")
+    .update({ stato: nuovoStato })
+    .eq("id", prenId)
+    .eq("attivita_id", attivitaId)
+    .select("nome_cliente, data, ora, n_persone")
+    .single();
+
+  if (error || !pren) {
+    return twimlResponse("Errore nell'aggiornamento. Riprova o usa la dashboard.");
+  }
+
+  const statoLabel = nuovoStato === "completata" ? "🚶 Uscito" : nuovoStato === "no_show" ? "❌ No show" : "🗑️ Disdetta";
+  const msg = `${statoLabel}\n\n${pren.nome_cliente}\nOre ${pren.ora} · ${pren.n_persone} persone\n\nDashboard aggiornata.`;
+
+  // Se completata, invia anche richiesta recensione al cliente
+  if (nuovoStato === "completata") {
+    try {
+      const { data: att } = await supabase
+        .from("attivita")
+        .select("nome, link_google, link_tripadvisor")
+        .eq("id", attivitaId)
+        .single();
+
+      if (att && (att.link_google || att.link_tripadvisor)) {
+        const { data: prenFull } = await supabase
+          .from("prenotazioni")
+          .select("telefono_cliente")
+          .eq("id", prenId)
+          .single();
+
+        if (prenFull?.telefono_cliente) {
+          let msgRecensione = `Grazie per aver cenato da ${att.nome || nomeAttivita}! Speriamo che sia stato di suo gradimento.\n\nSe ha apprezzato l'esperienza, ci farebbe molto piacere una sua recensione:`;
+          if (att.link_google) msgRecensione += `\n\nGoogle: ${att.link_google}`;
+          if (att.link_tripadvisor) msgRecensione += `\n\nTripAdvisor: ${att.link_tripadvisor}`;
+          msgRecensione += `\n\nGrazie e a presto!`;
+          await sendWhatsApp(prenFull.telefono_cliente, msgRecensione);
+        }
+      }
+    } catch (e) {
+      console.error("Errore invio recensione da titolare:", e);
+    }
+  }
+
+  return twimlResponse(msg);
+}
+
+// ============ ROUTES ============
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const mode = searchParams.get("hub.mode");
@@ -119,6 +272,13 @@ export async function POST(request: NextRequest) {
     const telefono = from.replace("whatsapp:", "");
     const to = ((formData.get("To") as string) || "").replace("whatsapp:", "");
 
+    // === CHECK SE IL MESSAGGIO È DAL TITOLARE ===
+    const attivitaTitolare = await findAttivitaByTitolare(telefono);
+    if (attivitaTitolare) {
+      return await handleMessaggioTitolare(body, attivitaTitolare);
+    }
+
+    // === FLUSSO NORMALE CLIENTE ===
     // Trova il ristorante dal numero WhatsApp di destinazione
     const attivita = await findAttivitaByWhatsApp(to);
 
@@ -300,14 +460,7 @@ REGOLE:
         await supabase.from("conversazioni_whatsapp").update({ messaggi: [], updated_at: new Date().toISOString() }).eq("id", conv.id);
 
         // Notifica disdetta al titolare
-        const ownerNumD = attivita.whatsapp || attivita.telefono;
-        if (ownerNumD && ownerNumD !== telefono) {
-          try {
-            await sendWhatsApp(ownerNumD, `Disdetta via WhatsApp\n\n${pren.nome_cliente}\n${dataF} ore ${pren.ora}\n${pren.n_persone} persone`);
-          } catch (e) {
-            console.error("Errore notifica disdetta titolare:", e);
-          }
-        }
+        await notificaTitolare(attivita, `🗑️ Disdetta via WhatsApp\n\n${pren.nome_cliente}\n${dataF} ore ${pren.ora}\n${pren.n_persone} persone`);
 
         return twimlResponse(conferma);
       }
@@ -335,7 +488,6 @@ REGOLE:
 
         if (error) {
           console.error("Errore inserimento prenotazione:", error);
-          // Salva comunque la conversazione
           conv.messaggi.push({ role: "user", content: body });
           conv.messaggi.push({ role: "assistant", content: "Errore prenotazione" });
           await salvaMessaggi(conv.id, conv.messaggi);
@@ -349,14 +501,7 @@ REGOLE:
         await supabase.from("conversazioni_whatsapp").update({ messaggi: [], updated_at: new Date().toISOString() }).eq("id", conv.id);
 
         // Notifica al titolare
-        const ownerNum = attivita.whatsapp || attivita.telefono;
-        if (ownerNum && ownerNum !== telefono) {
-          try {
-            await sendWhatsApp(ownerNum, `Nuova prenotazione WhatsApp!\n\n${nome}\n${dataFormattata}\nOre ${ora}\n${persone} persone${note ? `\nNote: ${note}` : ""}`);
-          } catch (e) {
-            console.error("Errore notifica titolare:", e);
-          }
-        }
+        await notificaTitolare(attivita, `📋 Nuova prenotazione WhatsApp!\n\n${nome}\n${dataFormattata}\nOre ${ora}\n${persone} persone${note ? `\nNote: ${note}` : ""}`);
 
         return twimlResponse(conferma);
       }

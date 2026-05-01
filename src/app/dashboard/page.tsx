@@ -76,7 +76,16 @@ export default function DashboardOggi() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prenotazioneId: id, attivitaId: attivita.id }),
-        }).catch(() => {}); // Non bloccare se fallisce
+        }).catch(() => {});
+      }
+
+      // Notifica il titolare del cambio stato
+      if (attivita && (nuovoStato === "completata" || nuovoStato === "no_show" || nuovoStato === "disdetta")) {
+        fetch("/api/notifica-titolare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prenotazioneId: id, attivitaId: attivita.id, evento: nuovoStato }),
+        }).catch(() => {});
       }
     } catch (e) {
       console.error("Errore cambio stato:", e);
